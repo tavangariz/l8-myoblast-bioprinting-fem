@@ -1,0 +1,31 @@
+services:
+  jupyter:
+    build: .
+    image: l8-myoblast-bioprinting-fem:latest
+    ports:
+      - "127.0.0.1:8888:8888"
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    restart: unless-stopped
+
+  # Optional: run the finite element sweep headlessly (no Jupyter), with the settings of the
+  # published grid, all 32 cases, written to results/fem/runs/docker_sweep.csv.
+  fem-sweep:
+    build: .
+    image: l8-myoblast-bioprinting-fem:latest
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    environment:
+      - L8_GEOM=ning
+      - L8_EPS_AX=1e-12
+      - L8_MESH_M=12
+      - L8_INERTIA=1
+      - L8_LTIP=10e-3
+      - L8_CSV_OUT=results/fem/runs/docker_sweep.csv
+    command: "python3 scripts/fem_bagley_inertia_2026-07-30.py"
+    profiles:
+      - fem   # only starts with: docker compose --profile fem up

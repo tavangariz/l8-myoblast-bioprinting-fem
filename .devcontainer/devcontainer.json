@@ -1,0 +1,35 @@
+{
+  "name": "L8 Myoblast Bioprinting — FEM + ML (DOLFINx 0.10)",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
+
+  // Forward the Jupyter port so the notebook is accessible in the browser
+  "forwardPorts": [8888],
+  "portsAttributes": {
+    "8888": {
+      "label": "Jupyter Lab",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  // VS Code extensions: Python, Jupyter, Pylance
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.pylance"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "jupyter.notebookFileRoot": "${workspaceFolder}"
+      }
+    }
+  },
+
+  "postCreateCommand": "mkdir -p /workspaces/l8-myoblast-bioprinting-fem/results/figures /workspaces/l8-myoblast-bioprinting-fem/results/optimal_params",
+
+  "workspaceFolder": "/workspaces/l8-myoblast-bioprinting-fem",
+  "remoteUser": "root"
+}

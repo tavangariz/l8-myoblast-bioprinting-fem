@@ -1,0 +1,135 @@
+{
+ "source": "Ning et al. 2018, ACS Biomater. Sci. Eng. 4:3906-3918, doi:10.1021/acsbiomaterials.8b00714, Eqs. 4-9, 15, 16, 19; Table 2; Fig. 6",
+ "pressure_kPa": [
+  50.0,
+  100.0,
+  200.0,
+  400.0
+ ],
+ "cells": {
+  "L8": {
+   "fig6_shear_pct": [
+    5.82,
+    5.55,
+    5.36,
+    5.16
+   ],
+   "exact_eq9_pct": [
+    0.951,
+    0.5225,
+    0.2864,
+    0.1604
+   ],
+   "fig6_minus_exact_pp": [
+    4.869,
+    5.027,
+    5.074,
+    5.0
+   ],
+   "exact_fall_50_to_400": 5.93,
+   "best_grid_intervals": 20,
+   "best_grid_points": 21,
+   "best_grid_pct": [
+    5.712,
+    5.389,
+    5.212,
+    5.119
+   ],
+   "best_grid_rms_pp": 0.123,
+   "grid20_pct": [
+    5.712,
+    5.389,
+    5.212,
+    5.119
+   ],
+   "grid20_rms_pp": 0.123
+  },
+  "RSC96": {
+   "fig6_shear_pct": [
+    5.68,
+    5.43,
+    5.21,
+    5.19
+   ],
+   "exact_eq9_pct": [
+    0.6429,
+    0.2449,
+    0.0921,
+    0.0359
+   ],
+   "fig6_minus_exact_pp": [
+    5.037,
+    5.185,
+    5.118,
+    5.154
+   ],
+   "exact_fall_50_to_400": 17.89,
+   "best_grid_intervals": 19,
+   "best_grid_points": 20,
+   "best_grid_pct": [
+    5.656,
+    5.408,
+    5.317,
+    5.284
+   ],
+   "best_grid_rms_pp": 0.073,
+   "grid20_pct": [
+    5.397,
+    5.147,
+    5.054,
+    5.021
+   ],
+   "grid20_rms_pp": 0.231
+  }
+ },
+ "model_vs_measured_L8": {
+  "model_Dt_pct": [
+   4.894,
+   6.278,
+   8.956,
+   20.531
+  ],
+  "measured_pct": [
+   6.99,
+   11.7,
+   15.53,
+   23.08
+  ],
+  "gap_pp": [
+   2.096,
+   5.422,
+   6.574,
+   2.549
+  ],
+  "shear_offset_pp": [
+   4.869,
+   5.028,
+   5.074,
+   4.999
+  ],
+  "gap_minus_offset_pp": [
+   -2.773,
+   0.395,
+   1.5,
+   -2.45
+  ],
+  "eq19_fit_residual_pp": [
+   -2.815,
+   0.304,
+   1.496,
+   -1.598
+  ],
+  "model_tau_e_Pa": [
+   439.1,
+   881.5,
+   1901.7,
+   10124.9
+  ],
+  "ning_tau_e_Pa": [
+   440.0,
+   899.0,
+   1893.0,
+   9251.0
+  ]
+ }
+}

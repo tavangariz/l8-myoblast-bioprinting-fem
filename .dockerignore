@@ -1,0 +1,21 @@
+.git/
+.gitignore
+.devcontainer/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.env
+
+# FEM scheduler logs
+results/fem/runs/*/*.out
+results/fem/runs/*/*.err
+results/fem/runs/*/*.log
+
+# Large binaries
+results/figures/*.png
+results/figures/*.pdf
+
+# OS
+.DS_Store
+Thumbs.db

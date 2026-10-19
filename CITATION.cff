@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "L8 myoblast bioprinting finite element and Gaussian process framework"
+abstract: >-
+  Axisymmetric finite element model (DOLFINx 0.10) of shear-thinning flow, with inertia,
+  through the cartridge and nozzle of an extrusion bioprinter, coupled to the damage law of
+  Ning et al. (2018) for L8 myoblasts, and a Gaussian process surrogate that maps applied
+  pressure and nozzle diameter to flow rate, wall shear stress and predicted cell damage.
+  Includes the 32-case simulation grid, the surrogate validation, the comparisons with
+  published data and the scripts behind every figure of the accompanying article.
+authors:
+  - family-names: Tavangari
+    given-names: Zahed
+    orcid: "https://orcid.org/0000-0002-7361-9109"
+    affiliation: "Department of Biosciences, Biotechnology and Environment, University of Bari Aldo Moro"
+  - family-names: Maghami
+    given-names: Ali
+    affiliation: "Chair of Cyber-Physical Systems in Mechanical Engineering, Technische Universität Berlin"
+  - family-names: Papangelo
+    given-names: Antonio
+    affiliation: "Department of Mechanics, Mathematics and Management, Polytechnic University of Bari"
+  - family-names: Genchi
+    given-names: Giada Graziana
+    orcid: "https://orcid.org/0000-0002-2154-7991"
+    affiliation: "Department of Biosciences, Biotechnology and Environment, University of Bari Aldo Moro; Smart Bio-Interfaces, Center for Materials Interfaces, Istituto Italiano di Tecnologia"
+repository-code: "https://github.com/tavangariz/l8-myoblast-bioprinting-fem"
+license: MIT
+keywords:
+  - extrusion bioprinting
+  - finite element method
+  - Gaussian process surrogate
+  - cell damage
+  - L8 myoblast
+  - operating window
+version: "1.0.0"
+date-released: "2026-10-19"
+preferred-citation:
+  type: article
+  title: "Fast computational screening of extrusion parameters for bioprinting of skeletal myoblasts in alginate hydrogel"
+  authors:
+    - family-names: Tavangari
+      given-names: Zahed
+      orcid: "https://orcid.org/0000-0002-7361-9109"
+      affiliation: "Department of Biosciences, Biotechnology and Environment, University of Bari Aldo Moro"
+    - family-names: Maghami
+      given-names: Ali
+      affiliation: "Chair of Cyber-Physical Systems in Mechanical Engineering, Technische Universität Berlin"
+    - family-names: Papangelo
+      given-names: Antonio
+      affiliation: "Department of Mechanics, Mathematics and Management, Polytechnic University of Bari"
+    - family-names: Genchi
+      given-names: Giada Graziana
+      orcid: "https://orcid.org/0000-0002-2154-7991"
+      affiliation: "Department of Biosciences, Biotechnology and Environment, University of Bari Aldo Moro; Smart Bio-Interfaces, Center for Materials Interfaces, Istituto Italiano di Tecnologia"
+  journal: "BMC Biomedical Materials Science"
+  status: submitted
+  year: 2026

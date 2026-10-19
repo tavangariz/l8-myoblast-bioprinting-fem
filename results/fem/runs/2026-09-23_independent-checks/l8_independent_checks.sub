@@ -1,0 +1,39 @@
+# Independent FEM checks of the GP surrogate, fixed by prespecify_fem_checks.py
+# before any case was solved. Same solver, image and settings as the canonical grid;
+# only the run directory and the case list differ.
+universe                = vanilla
+getenv                  = True
+should_transfer_files   = YES
+transfer_executable     = False
+when_to_transfer_output = ON_EXIT
+
+executable = /usr/bin/apptainer
+
+request_cpus   = 1
+request_memory = 8 GB
+request_disk   = 10 GB
+
+arguments = "exec $ENV(HOME)/htcondor/images/l8-fem.sif python3 -u $ENV(HOME)/l8-fem/scripts/fem_bagley_inertia_2026-07-30.py"
+
+RUNDIR = $ENV(HOME)/l8-fem/results/fem/runs/2026-09-23_independent-checks
+TAG    = M$(MESH)_D$(DIA)_P$(PRESS)
+
+environment = "L8_GEOM=ning L8_EPS_AX=1e-12 L8_MESH_M=$(MESH) L8_INERTIA=1 L8_NEEDLES=$(DIA) L8_PRESSURES=$(PRESS) L8_CSV_OUT=$(RUNDIR)/$(TAG).csv MPLBACKEND=Agg OMP_NUM_THREADS=1"
+
+output = $(RUNDIR)/logs/$(TAG).out
+error  = $(RUNDIR)/logs/$(TAG).err
+log    = $(RUNDIR)/logs/$(TAG).log
+
+queue MESH, DIA, PRESS from (
+  12, 100, 298.5
+  12, 200, 72.7
+  12, 200, 393.4
+  12, 250, 46.5
+  12, 250, 299.6
+  12, 330, 26.6
+  12, 330, 213.8
+  12, 150, 133.2
+  12, 290, 35
+  12, 290, 249.4
+  12, 150, 300
+)

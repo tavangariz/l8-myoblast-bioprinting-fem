@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.egg-info/
+.env
+dist/
+build/
+fenics_cache/
+
+# large binaries; the reference-condition checkpoint is the one that ships
+*.h5
+*.xdmf
+*.pkl
+!results/fem/checkpoints/fem_solution.pkl
+*.mp4
+results/figures/
+
+# cluster job logs
+*.err
+*.out
+*.log
+
+.DS_Store
+Thumbs.db
+
+# solver run manifest, written to the working directory
+MANIFEST.json
