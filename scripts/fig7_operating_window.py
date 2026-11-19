@@ -2,8 +2,10 @@
 """Fig. 7: operating window and the effect of the applied constraint.
 
 (A) Total damage over the pressure-diameter plane with the two criteria, Dt = 20 % and
-Q = 1 µL/s, the 32 grid cases and the eleven FEM checks. (B) Total damage against flow rate for
-each nozzle.
+Q = 1 µL/s, the 32 grid cases, the ranges of entrance stress (440-9251 Pa) and wall shear stress
+(100-1000 Pa) on which the two damage branches were calibrated, the eleven FEM checks of the
+published damage law and the four of the 20 % limit on the total damage (Additional file 1,
+Table S5). (B) Total damage against flow rate for each nozzle.
 
     python scripts/fig7_operating_window.py
 """
@@ -73,15 +75,22 @@ def main():
     P = S.PAPER
     # The height includes room for panel (a)'s key below the axes: a key outside costs vertical space
     # rather than covering data.
-    fig, (axa, axb) = plt.subplots(1, 2, figsize=(S.PAGE_W_IN, 3.6000), dpi=P["dpi"],
+    fig, (axa, axb) = plt.subplots(1, 2, figsize=(S.PAGE_W_IN, 4.0500), dpi=P["dpi"],
                                    gridspec_kw=dict(wspace=0.56))
     cax = axa.inset_axes([1.035, 0.0, 0.042, 1.0], transform=axa.transAxes)
 
     pp = np.linspace(25, 400, 260)
     dd = np.linspace(min(dias), max(dias), 240)
     PG, DG = np.meshgrid(pp, dd)
-    DT = gp_dt.predict(z(PG, DG)).reshape(PG.shape)
+    # The surrogate emulates Dn; the window is drawn on the total Dt = D0 + (1 - D0) Dn (Eq. 25)
+    DT = SUR.total_from_dn(gp_dt.predict(z(PG, DG))).reshape(PG.shape)
     LQ = gp_logq.predict(z(PG, DG)).reshape(PG.shape)
+    # Calibration ranges: where each damage branch is interpolated and where it is extrapolated, drawn
+    # on the same plane as the window.
+    gp_te, _ = SUR.fit_field("tau_ext_Pa", rows, log10=True)
+    gp_tw, _ = SUR.fit_field("tau_w_Pa", rows, log10=True)
+    LTE = gp_te.predict(z(PG, DG)).reshape(PG.shape)
+    LTW = gp_tw.predict(z(PG, DG)).reshape(PG.shape)
 
     # A rectangular colour bar, not an arrow.
     lo, hi = float(np.floor(DT.min())), float(np.ceil(DT.max()))
@@ -103,6 +112,12 @@ def main():
     # region.
     axa.contour(PG, DG, 10.0 ** LQ, levels=[Q_FLOOR], colors="white",
                 linewidths=2.2, linestyles="--")
+    # Light grey on the field, like the white constraint lines (black in the key, as those are),
+    # so the ranges stay readable on the dark end of the damage colormap.
+    axa.contour(PG, DG, LTE, levels=[np.log10(440.0), np.log10(9251.0)], colors="#E6E6E6",
+                linewidths=1.5, linestyles=":", zorder=4)
+    axa.contour(PG, DG, LTW, levels=[np.log10(100.0), np.log10(1000.0)], colors="#E6E6E6",
+                linewidths=1.3, linestyles="-.", zorder=4)
     # The two constraint lines are named in the legend, not on the field.
 
 
@@ -133,7 +148,14 @@ def main():
     for c in checks:
         axa.plot(float(c["pressure_kPa"]), float(c["needle_um"]), marker="D", ms=ms_check,
                  mfc=S.ANNOT, mec="white", mew=0.5, ls="none", zorder=7, clip_on=True)
-    print(f"  independent FEM checks drawn: {len(checks)}")
+    # The four checks fixed on the recalibrated damage limit (prespecify_boundary_checks.py), drawn as
+    # squares so the two sets stay apart.
+    d0_csv = checks_csv.parents[1] / "2026-10-31_boundary-checks" / "checks_vs_surrogate.csv"
+    checks_d0 = list(csv.DictReader(open(d0_csv))) if d0_csv.exists() else []
+    for c in checks_d0:
+        axa.plot(float(c["pressure_kPa"]), float(c["needle_um"]), marker="s", ms=ms_check,
+                 mfc=S.ANNOT, mec="white", mew=0.5, ls="none", zorder=7, clip_on=True)
+    print(f"  FEM checks drawn: {len(checks)} + {len(checks_d0)}")
 
     axa.set_xlabel(S.LBL["pressure"])
     axa.set_ylabel(S.LBL["diameter"])
@@ -153,13 +175,17 @@ def main():
         Line2D([], [], marker="o", mfc="white", mec=S.INK, mew=1.1, ls="none",
                ms=P["ms"], label="FEM condition"),
     ] + ([Line2D([], [], marker="D", mfc=S.ANNOT, mec="white", mew=0.5, ls="none",
-                 ms=ms_check, label="independent FEM check")] if checks else []) + [
+                 ms=ms_check, label="check, published law")] if checks else []) + (
+        [Line2D([], [], marker="s", mfc=S.ANNOT, mec="white", mew=0.5, ls="none",
+                ms=ms_check, label="check, recalibrated limit")] if checks_d0 else []) + [
         # The swatch is filled before it is hatched.
         Patch(facecolor=plt.get_cmap(S.CMAP_DT)(0.45), edgecolor=HATCH_C,
               hatch=HATCH, linewidth=0.6,
               label="outside the window"),
-        Line2D([], [], color=S.INK, lw=2.6, label=f"$D_t$ = {D_LIMIT:.0f} %"),
+        Line2D([], [], color=S.INK, lw=2.6, label=f"$D_t$ = {D_LIMIT:.0f}%"),
         Line2D([], [], color=S.INK, lw=2.2, ls="--", label=f"$Q$ = {Q_FLOOR:.0f} µL/s"),
+        Line2D([], [], color=S.INK, lw=1.1, ls=":", label="$\\tau_e$ = 440 and 9251 Pa"),
+        Line2D([], [], color=S.INK, lw=1.0, ls="-.", label="$\\tau_w$ = 100 and 1000 Pa"),
     ] + [
     # Two by two, not one row of four.
     ], loc="upper center", bbox_to_anchor=(0.5, -0.155), ncol=2, frameon=False,
@@ -173,7 +199,7 @@ def main():
                      color=S.dia_color(d), lw=P["lw_data"], ms=P["ms"],
                      mec="white", mew=0.8, label=S.dia_label(d), zorder=3)
     axb.axhline(D_LIMIT, color=S.THRESHOLD, lw=1.2, ls="--", zorder=1,
-                label=f"$D_t$ = {D_LIMIT:.0f} % limit")
+                label=f"$D_t$ = {D_LIMIT:.0f}% damage limit")
     # Named in the legend, not printed across the panel
 
     # The read-out is restricted to tips that actually reach Q_REF.
@@ -187,7 +213,7 @@ def main():
         at_ref[d] = float(np.interp(np.log10(Q_REF), np.log10(qs), [r["Dt_pct"] for r in s]))
     # Named in the key.
     axb.axvline(Q_REF, ymax=0.975, color=S.ANNOT, lw=1.4, ls=":", zorder=2,
-                label=f"$Q$ = {Q_REF:.1f} µL/s, reference point")
+                label=f"$Q$ = {Q_REF:.2f} µL/s, reference condition")
     # Journal rule: figure titles and legends go in the main manuscript, never inside the graphic
     # file.
 
@@ -207,7 +233,7 @@ def main():
 
     # No tight_layout: it re-solves the column widths and would undo the equal split, and it cannot
     # see an inset colour bar as something needing room.
-    fig.subplots_adjust(left=0.085, right=0.975, top=0.9333, bottom=0.2895)
+    fig.subplots_adjust(left=0.085, right=0.975, top=0.9259, bottom=0.3535)
     S.snap_panel_labels(fig)
 
     # Centre panel (a)'s key under panel (a) and its colour bar. Anchored to the axes alone it

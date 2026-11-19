@@ -1,0 +1,63 @@
+# RSC96 Schwann-cell suspension of Ning et al. (2018) on the cartridge, nozzles and mesh of the L8 grid,
+# with its own power-law rheology (K = 20.81 Pa s^n, n = 0.37) set through L8_K_VIS and L8_N_EXP. The last
+# case runs the L8 rheology through the same settings and must reproduce the canonical flow rate, 17.94 uL/s.
+universe                = vanilla
+getenv                  = True
+should_transfer_files   = YES
+transfer_executable     = False
+when_to_transfer_output = ON_EXIT
+
+executable = /usr/bin/apptainer
+
+request_cpus   = 1
+request_memory = 8 GB
+request_disk   = 10 GB
+
+arguments = "exec $ENV(HOME)/htcondor/images/l8-fem.sif python3 -u $ENV(HOME)/l8-fem/scripts/fem_bagley_inertia_2026-07-30.py"
+
+RUNDIR = $ENV(HOME)/l8-fem/results/fem/runs/2026-10-31_rsc96
+TAG    = $(LINE)_M$(MESH)_D$(DIA)_P$(PRESS)
+
+environment = "L8_GEOM=ning L8_EPS_AX=1e-12 L8_MESH_M=$(MESH) L8_INERTIA=1 L8_NEEDLES=$(DIA) L8_PRESSURES=$(PRESS) L8_K_VIS=$(KVIS) L8_N_EXP=$(NEXP) L8_CSV_OUT=$(RUNDIR)/$(TAG).csv MPLBACKEND=Agg OMP_NUM_THREADS=1"
+
+output = $(RUNDIR)/logs/$(TAG).out
+error  = $(RUNDIR)/logs/$(TAG).err
+log    = $(RUNDIR)/logs/$(TAG).log
+
+queue MESH, DIA, PRESS, KVIS, NEXP, LINE from (
+  12, 100, 25, 20.81, 0.37, RSC96
+  12, 100, 50, 20.81, 0.37, RSC96
+  12, 100, 75, 20.81, 0.37, RSC96
+  12, 100, 100, 20.81, 0.37, RSC96
+  12, 100, 150, 20.81, 0.37, RSC96
+  12, 100, 200, 20.81, 0.37, RSC96
+  12, 100, 300, 20.81, 0.37, RSC96
+  12, 100, 400, 20.81, 0.37, RSC96
+  12, 200, 25, 20.81, 0.37, RSC96
+  12, 200, 50, 20.81, 0.37, RSC96
+  12, 200, 75, 20.81, 0.37, RSC96
+  12, 200, 100, 20.81, 0.37, RSC96
+  12, 200, 150, 20.81, 0.37, RSC96
+  12, 200, 200, 20.81, 0.37, RSC96
+  12, 200, 300, 20.81, 0.37, RSC96
+  12, 200, 400, 20.81, 0.37, RSC96
+  12, 250, 25, 20.81, 0.37, RSC96
+  12, 250, 50, 20.81, 0.37, RSC96
+  12, 250, 75, 20.81, 0.37, RSC96
+  12, 250, 100, 20.81, 0.37, RSC96
+  12, 250, 150, 20.81, 0.37, RSC96
+  12, 250, 200, 20.81, 0.37, RSC96
+  12, 250, 300, 20.81, 0.37, RSC96
+  12, 250, 400, 20.81, 0.37, RSC96
+  12, 330, 25, 20.81, 0.37, RSC96
+  12, 330, 50, 20.81, 0.37, RSC96
+  12, 330, 75, 20.81, 0.37, RSC96
+  12, 330, 100, 20.81, 0.37, RSC96
+  12, 330, 150, 20.81, 0.37, RSC96
+  12, 330, 200, 20.81, 0.37, RSC96
+  12, 330, 300, 20.81, 0.37, RSC96
+  12, 330, 400, 20.81, 0.37, RSC96
+  12, 100, 450, 20.81, 0.37, RSC96
+  12, 100, 500, 20.81, 0.37, RSC96
+  12, 200, 200, 25.60, 0.35, L8control
+)

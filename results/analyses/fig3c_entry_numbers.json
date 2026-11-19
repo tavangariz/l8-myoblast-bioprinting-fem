@@ -1,0 +1,20 @@
+{
+ "seeded": 440,
+ "reached_outlet": 440,
+ "dropped_above_wall": 0,
+ "kept": 440,
+ "gdot_wall_per_s": 33447.098837009864,
+ "release_z_mm": 0.2,
+ "read_depth_um": 200.0000000000005,
+ "ode_rtol": 1e-08,
+ "ode_atol": 1e-13,
+ "developed_ratio_median": 1.0005198930193566,
+ "developed_ratio_p05": 0.9932340643378753,
+ "developed_ratio_p95": 1.0200898479319276,
+ "median_shift_at_2p5_diameters_pct": 0.3161272301078544,
+ "gdot_min_per_s": 17.136406244976783,
+ "gdot_max_per_s": 29579.048936693907,
+ "gdot_median_per_s": 11147.663808708037,
+ "r_max_um": 95.7553022282728,
+ "r_min_um": 7.350808744295276
+}

@@ -1,8 +1,8 @@
 """Surrogate diagnostics; not a figure of the article.
 
 Leave-one-out parity, learning curve, comparison with polynomial surfaces and interval
-calibration of the total-damage surrogate, on one sheet. figS3_interval_calibration.py draws the
-calibration panel alone.
+calibration of the surrogate of the condition-dependent damage Dn, on one sheet.
+figS3_interval_calibration.py draws the calibration panel alone.
 
     python scripts/surrogate_diagnostics.py
 """
@@ -216,7 +216,7 @@ def panel_calibration(ax, y, pred, sd, dia, letter="D"):
 def main():
     rows = SUR.load_grid()
     X = np.array([[r["pressure_kPa"], r["needle_um"]] for r in rows])
-    y = np.array([r["Dt_pct"] for r in rows])
+    y = np.array([r.get("Dn_pct", r["Dt_pct"]) for r in rows])
     dia = np.array([int(r["needle_um"]) for r in rows])
     Xz = (X - X.mean(0)) / X.std(0)
 

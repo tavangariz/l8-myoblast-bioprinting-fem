@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Additional file 1, Fig. S2: three checks on the model.
 
-(A) Change in predicted total damage between meshes M12 and M16. (B) Entrance share of the
-predicted damage against applied pressure. (C) Entrance pressure against a Bagley extrapolation
-to zero nozzle length.
+(A) Change in the condition-dependent damage Dn between meshes M12 and M16. (B) Entrance share of
+Dn against applied pressure. (C) Entrance pressure against a Bagley extrapolation to zero nozzle
+length.
 
     python scripts/figS2_model_checks.py
 """
@@ -38,7 +38,7 @@ def main():
     for r in csv.DictReader(open(canon)):
         d = int(round(float(r["needle_um"])))
         by_tip[d].append((float(r["pressure_kPa"]),
-                          100 * float(r["Det_pct"]) / float(r["Dt_pct"])))
+                          100 * float(r["Det_pct"]) / float(r.get("Dn_pct", r["Dt_pct"]))))
     for d in by_tip:
         by_tip[d].sort()
 
@@ -77,10 +77,10 @@ def main():
     a.set_xlabel(S.LBL["pressure"])
     # Short, because a longer label grows taller than this 39 mm panel and meets the panel
     # letter. The caption names the two meshes, so the axis label does not have to repeat it.
-    a.set_ylabel("|Δ$D_t$| between meshes (pp)")
+    a.set_ylabel("|Δ$D_n$| between meshes (pp)")
     S.panel_label(a, "A")
     # No key inside this panel.
-    a.annotate("worst difference", xy=(0.03, worst), xycoords=("axes fraction", "data"),
+    a.annotate("largest difference", xy=(0.03, worst), xycoords=("axes fraction", "data"),
                xytext=(0, -3), textcoords="offset points", fontsize=FS_G, color=S.MUTE,
                ha="left", va="top")
 
@@ -88,7 +88,7 @@ def main():
     # the inline rule label, so that is what is tested.
     fig.canvas.draw()
     _rend = fig.canvas.get_renderer()
-    _wl = [t for t in a.texts if t.get_text() == "worst difference"][0]
+    _wl = [t for t in a.texts if t.get_text() == "largest difference"][0]
     _lb = _wl.get_window_extent(_rend)
     _hit = 0
     for d in TIPS:
@@ -122,7 +122,7 @@ def main():
     # Not a diameter colour.
     c.bar(x - w / 2, [r[1] for r in rows], w, color=S.ANNOT, label="Bagley intercept")
     c.bar(x + w / 2, [r[4] for r in rows], w, color="#E2E8F0", edgecolor="#333333", lw=0.7,
-          label="reported $p_{en}$")
+          label="computed $p_{en}$")
     # The result value belongs in the caption, not on the axes; it is printed to stdout so the
     # caption stays in step with the data.
     print("  caption (c)  ·  " + "  ".join(f"Ø{n}: {100*(rep-ic)/ic:+.1f} %"

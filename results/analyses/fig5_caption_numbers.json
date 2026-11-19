@@ -1,0 +1,23 @@
+{
+ "n_tracers": 168,
+ "Ds_min_pct": 0.0503,
+ "Ds_max_pct": 0.5106,
+ "Det_pct": 8.6948,
+ "Dn_spread_pp": 0.4203,
+ "nozzle_r_max_um": 95.274,
+ "layer_um": 4.726,
+ "entry_r_max_um": 98.237,
+ "release_r_max_mm": 1.9895,
+ "layer_flow_release_pct": 1.401,
+ "layer_flow_pct": 1.212,
+ "layer_r_offset_um": 0.37,
+ "area_average_pct": 0.2864,
+ "flow_weighted_pct": 0.1816,
+ "n_tail_099": 54,
+ "frac_above_168max_099_pct": 5.57,
+ "frac_above_168max_flux_pct": 1.11,
+ "r_min_um": 9.59,
+ "t_res_inner_ms": 11.5,
+ "t_res_outer_ms": 67.7,
+ "Dn_mean_pct": 8.897
+}

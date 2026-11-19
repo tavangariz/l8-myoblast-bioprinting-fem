@@ -14,14 +14,17 @@ import math
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from l8_geometry import GEOM, L_NEEDLE  # noqa: E402  one definition of the domain for every script
+
 K_VIS, N_EXP = 25.60, 0.35
 
 # Feed-line geometry of this screening test: three sequential straight sections, 32.5 mm
 # in all. The published grid is solved on the Ning domain of l8_geometry (a 10.5 mm straight
 # cartridge, a 1.5 mm funnel, then the tip), so this test does not correct the published grid.
-R_BARREL, L_BARREL = 2.1e-3, 12.0e-3      # z 0 -> 12 mm
-R_MID, L_MID = 1.0e-3, 10.5e-3            # z 12 -> 22.5 mm
-L_TIP = 10.0e-3                           # z 22.5 -> 32.5 mm
+R_BARREL, L_BARREL = GEOM["Rin"], GEOM["z2"]     # z 0 -> 12 mm   (Ning's L_c1)
+R_MID, L_MID = GEOM["Rmid"], GEOM["z1"]          # z 12 -> 22.5 mm (Ning's L_c2)
+L_TIP = L_NEEDLE                          # z 22.5 -> 32.5 mm
 
 # Ning et al. 2018 Table 2: (P_kPa, D_um) -> P_en in Pa, from their COMSOL model,
 # itself validated against their weighed mass flow rates.

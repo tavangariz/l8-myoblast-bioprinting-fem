@@ -1,10 +1,12 @@
 """The Gaussian process surrogate.
 
-One GP each for total damage, log10 Q and log10 tau_w, with applied pressure and nozzle diameter
-as inputs: Matérn 5/2 kernel times a constant, standardized inputs, normalized targets,
-alpha = 1e-6, ten optimizer restarts, seed 0. Every figure and validation script imports the
-surrogate from here. fit_all() repeats the leave-one-out cross-validation and stops if the mean
-absolute error in total damage differs from the 0.338 percentage points reported in the article.
+One GP each for the condition-dependent damage Dn, log10 Q and log10 tau_w, with applied pressure
+and nozzle diameter as inputs: Matérn 5/2 kernel times a constant, standardized inputs, normalized
+targets, alpha = 1e-6, ten optimizer restarts, seed 0. total_from_dn() and dn_from_total() convert
+between Dn and the total damage Dt = D0 + (1 - D0) Dn (Eq. 25), on which the operating window is
+decided. Every figure and validation script imports the surrogate from here. fit_all() repeats the
+leave-one-out cross-validation and stops if the mean absolute error in Dn differs from the 0.338
+percentage points reported in the article.
 """
 from __future__ import annotations
 
@@ -12,6 +14,7 @@ import csv
 from pathlib import Path
 
 import numpy as np
+from l8_damage import D0
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Matern
 
@@ -26,7 +29,7 @@ ALPHA = 1e-6
 N_RESTARTS = 10
 SEED = 0
 
-LOO_DT_REPORTED = 0.338        # pp, leave-one-case-out on the 32-case grid, reported in the article.
+LOO_DT_REPORTED = 0.338        # pp, leave-one-case-out on the 32-case grid, reported in the article (on Dn).
                               # A version-drift guard, not an accuracy requirement: it stops
                               # every importer if the grid, the configuration or a library
                               # changes the fit. The accuracy evidence is in
@@ -94,7 +97,7 @@ def fit_all(rows: list[dict] | None = None, check: bool = True):
     mu, sd = X.mean(0), X.std(0)
     Xz = (X - mu) / sd
 
-    dt = np.array([r["Dt_pct"] for r in rows])
+    dt = np.array([r.get("Dn_pct", r["Dt_pct"]) for r in rows])    # the surrogate emulates Dn
     logq = np.log10([r["Q_uLs"] for r in rows])
 
     gp_dt, gp_logq = _fit(Xz, dt), _fit(Xz, logq)
@@ -160,11 +163,21 @@ def operating_point(gp_dt, gp_logq, z, diameter_um: float, q_min: float = Q_MIN,
         raise ValueError(f"{diameter_um} µm is outside the trained diameters {D_TRAINED}")
     P = np.linspace(*P_TRAINED, n)
     Xz = z(P, np.full_like(P, diameter_um))
-    dt = gp_dt.predict(Xz)
+    dt = total_from_dn(gp_dt.predict(Xz))
     q = 10 ** gp_logq.predict(Xz)
     ok = (dt < dt_max) & (q >= q_min)
     if not ok.any():
         return None
     i = np.flatnonzero(ok)[np.argmin(dt[ok])]
     return {"needle_um": float(diameter_um), "P_kPa": float(P[i]),
-            "Dt_pct": float(dt[i]), "Q_uLs": float(q[i])}
+            "Dt_pct": float(dt[i]), "Dn_pct": float(dn_from_total(dt[i])), "Q_uLs": float(q[i])}
+
+
+def total_from_dn(dn_pct):
+    """Total predicted damage Dt (%) from the condition-dependent damage Dn (%) the surrogate
+    emulates: Dt = D0 + (1 - D0) Dn, with the pressure-independent D0 of l8_damage (Eq. 25)."""
+    return 100.0 * (D0 + (1.0 - D0) * np.asarray(dn_pct, float) / 100.0)
+
+
+def dn_from_total(dt_pct):
+    return 100.0 * (np.asarray(dt_pct, float) / 100.0 - D0) / (1.0 - D0)

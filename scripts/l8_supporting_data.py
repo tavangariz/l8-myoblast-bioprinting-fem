@@ -21,15 +21,12 @@ from l8_paths import CANONICAL_GRID, CHECKPOINT, DATA, require  # noqa: E402
 
 TIPS = (100, 200, 250, 330)
 
-# Tracer_entry() — Lagrangian tracers, shear rate and radius at needle entry
+# Tracer_entry() — Lagrangian tracers, shear rate and radius in the nozzle
 _K_VIS, _N_EXP = 25.60, 0.35
-_N_WANT = 168
-# 440 seeded, 168 wanted: seeding beyond the wanted count and truncating keeps the ensemble off the
-# re-entrant corner singularity while still reaching 168 physical survivors — see the gdot_wall cut
-# below.
 _N_CELLS_DEFAULT = 440
 _RNG_SEED = 42
 _Z_SEED_DEFAULT = 2e-4
+_READ_DEPTH_DIAMETERS = 1.0   # the reading plane, in nozzle diameters past the inlet plane z2
 
 
 def _load_ckpt_fields(path):
@@ -43,14 +40,13 @@ def _load_ckpt_fields(path):
 def _integrate_to_outlet(raw, n_cells, z_seed):
     """Track `n_cells` tracers, seeded uniform by area at z = z_seed, to the outlet.
 
-    Identical integration to `fig5_lagrangian_tracers.py`'s own tracking (same ODE, same
-    outlet event, same wall test), except every seed is kept rather than only the first
-    n_want survivors, and the seed count and release plane are the ones the source script
-    used for this panel (440 tracers released at z = 0.2 mm), not the ones Fig. 3 uses (168
-    wanted from a 4x pool, released at z = 5 mm).
+    The ODE, the tolerances (`fig5_lagrangian_tracers.RTOL`, `ATOL`), the outlet event and the
+    wall test are those of the Fig. 5 tracking; only the release plane (0.2 mm into the cartridge)
+    and the seed count differ. Returns the paths that reach the outlet inside the bore.
     """
     from scipy.integrate import solve_ivp
     from scipy.interpolate import LinearNDInterpolator
+    import fig5_lagrangian_tracers as F
 
     g = raw["geom"]
     interp_r = LinearNDInterpolator(raw["pts2d"], raw["u"][:, 0], fill_value=np.nan)
@@ -69,28 +65,41 @@ def _integrate_to_outlet(raw, n_cells, z_seed):
 
     rng = np.random.default_rng(_RNG_SEED)
     r_seeds = 0.95 * g["Rin"] * np.sqrt(rng.uniform(0, 1, n_cells))
-    th_seeds = rng.uniform(0.0, 2.0 * np.pi, n_cells)   # drawn to keep the RNG stream aligned
 
     paths = []
     for i in range(n_cells):
         sol = solve_ivp(ode, (0.0, 120.0), [float(r_seeds[i]), z_seed], events=outlet,
-                         max_step=0.01, rtol=1e-4, atol=1e-9)
+                        max_step=0.01, rtol=F.RTOL, atol=F.ATOL)
         path = sol.y[:2].T
         wall_ok = np.all(np.abs(path[:, 0]) <= wall_radius(path[:, 1], g) + 3e-6)
         if path.shape[0] <= 5 or not wall_ok or path[-1, 1] < g["z3"] * 0.999:
             continue
         paths.append(path)
-    _ = th_seeds  # consumed only to keep the RNG draw sequence identical to the source
     return paths
 
 
-def tracer_entry():
-    """gdot and radius at tip entry for the 168 physical tracers.
+def _radius_at(path, z, rmax):
+    """|r| where a tracer crosses the plane z: a cubic in z through the two stored path points on either side of it,
+    as `fig5_lagrangian_tracers.entry_radius` reads the inlet plane."""
+    j = int(np.argmax(path[:, 1] >= z))
+    k = slice(max(j - 2, 0), min(j + 2, len(path)))
+    zz, rr = path[k, 1] - z, path[k, 0]
+    return float(min(abs(np.polyval(np.polyfit(zz, rr, min(3, len(zz) - 1)), 0.0)), rmax))
 
-    Drops any tracer whose recorded entry
-    shear exceeds the analytic wall value — a re-entrant-corner-singularity artefact, not a
-    resolved sample — before truncating to the 168 the manuscript reports.
+
+def tracer_entry(stats=None):
+    """Radius and shear rate in the nozzle for every tracer of the entry set, read one nozzle diameter past the inlet.
+
+    On the inlet plane z = z2 itself the strain rate of the solution is dominated by the extension of the
+    contraction, and it is singular at the re-entrant corner, so a reading there depends on where it is taken. One
+    nozzle diameter downstream the velocity profile has developed. Both are checked on every run and written into
+    `stats`: the ratio of each reading to the developed power-law profile gdot_wall (r/R)^(1/n) at the same radius,
+    and the change of the median when the plane moves to 2.5 diameters. The radius is read where each path crosses
+    the plane, the radius at which the tracer travels through the nozzle. A tracer whose shear rate exceeds the analytic wall value would be a reading of the corner singularity and
+    is dropped; at this plane none does. If `stats` is a dict, the seeded, arrived, dropped and kept counts, the
+    reading depth and the wall value are written into it.
     """
+    import fig5_lagrangian_tracers as F
     require(CHECKPOINT, "the solver checkpoint")
     raw = _load_ckpt_fields(str(CHECKPOINT))
     g = raw["geom"]
@@ -99,32 +108,37 @@ def tracer_entry():
 
     paths = _integrate_to_outlet(raw, _N_CELLS_DEFAULT, _Z_SEED_DEFAULT)
 
-    r_e, g_e = [], []
-    for p_ in paths:
-        r, z = np.abs(p_[:, 0]), p_[:, 1]
-        i = int(np.argmax(z >= g["z2"]))
-        if z[i] >= g["z2"]:
-            r_e.append(min(r[i], g["Rtip"]))
-            g_e.append(float(gd_interp([[r[i], z[i]]])[0]))
-    r_e, g_e = np.asarray(r_e), np.asarray(g_e)
+    z_read = g["z2"] + _READ_DEPTH_DIAMETERS * 2.0 * g["Rtip"]
+    assert z_read < g["z3"], "the reading plane lies beyond the nozzle outlet"
+    r_e = np.array([_radius_at(p_, z_read, g["Rtip"]) for p_ in paths])
+    g_e = np.array([float(gd_interp([[r, z_read]])[0]) for r in r_e])
 
-    # A tracer's shear rate as it enters the tip cannot physically exceed the wall value there; a
-    # sample above it is reading the re-entrant corner singularity.
+    # The cap is derived from the checkpoint's own tau_w, not typed.
     gdot_wall = (raw["tau_w"] / _K_VIS) ** (1.0 / _N_EXP)
-    keep = g_e <= gdot_wall
+    keep = np.isfinite(g_e) & (g_e <= gdot_wall)
     n_drop = int((~keep).sum())
-    if n_drop:
-        print(f"    dropped {n_drop} corner-singularity tracer(s) above "
-              f"gdot_wall = {gdot_wall:.4g} 1/s")
-    r_e, g_e = r_e[keep], g_e[keep]
-    if len(r_e) < _N_WANT:
-        raise SystemExit(f"only {len(r_e)} physical tracers reached the tip; widen "
-                         f"the seed pool beyond {_N_CELLS_DEFAULT} to reach {_N_WANT}")
-    return r_e[:_N_WANT], g_e[:_N_WANT]
+    print(f"    {len(paths)} of {_N_CELLS_DEFAULT} tracers reach the outlet; read {1e6 * (z_read - g['z2']):.0f} um past "
+          f"the inlet; {n_drop} above gdot_wall = {gdot_wall:.4g} 1/s; {int(keep.sum())} kept")
+    # Developed-flow checks: the reading against the power-law profile, and against a plane 2.5 diameters in
+    ratio = g_e[keep] / (gdot_wall * (r_e[keep] / g["Rtip"]) ** (1.0 / _N_EXP))
+    z_far = g["z2"] + 2.5 * 2.0 * g["Rtip"]
+    r_far = np.array([_radius_at(p_, z_far, g["Rtip"]) for p_ in paths])
+    g_far = np.array([float(gd_interp([[r, z_far]])[0]) for r in r_far])
+    shift = 100.0 * (np.median(g_far[keep]) / np.median(g_e[keep]) - 1.0)
+    q05, q50, q95 = np.quantile(ratio, [0.05, 0.5, 0.95])
+    print(f"    reading / developed profile: median {q50:.3f}, 5-95% {q05:.3f}-{q95:.3f}; median at 2.5 diameters "
+          f"{shift:+.2f}%")
+    if stats is not None:
+        stats.update(seeded=_N_CELLS_DEFAULT, reached_outlet=len(paths), dropped_above_wall=n_drop,
+                     kept=int(keep.sum()), gdot_wall_per_s=gdot_wall, release_z_mm=1e3 * _Z_SEED_DEFAULT,
+                     read_depth_um=1e6 * (z_read - g["z2"]), ode_rtol=F.RTOL, ode_atol=F.ATOL,
+                     developed_ratio_median=float(q50), developed_ratio_p05=float(q05), developed_ratio_p95=float(q95),
+                     median_shift_at_2p5_diameters_pct=float(shift))
+    return r_e[keep], g_e[keep]
 
 
 # Read_pairs() — M12/M16 mesh-convergence pairing, 32 cases
-_R_TIP = {100: 50e-6, 200: 100e-6, 250: 125e-6, 330: 165e-6}
+_R_TIP = TIP_RADIUS_M
 _GRID_DIR = DATA / "fem" / "runs" / "2026-08-26_ning-grid32"
 
 
@@ -141,8 +155,8 @@ def read_pairs():
     for M in (12, 16):
         lo = _col(_GRID_DIR / f"ning_grid_M{M}_D200.csv")
         hi = _col(_GRID_DIR / f"ning_grid_M{M}_D330.csv")
-        d2 = derive(200.0, float(lo[200.0]["Q_uLs"]), _R_TIP[200])["Dt_pct"]
-        d3 = derive(200.0, float(hi[200.0]["Q_uLs"]), _R_TIP[330])["Dt_pct"]
+        d2 = derive(200.0, float(lo[200.0]["Q_uLs"]), _R_TIP[200])["Dn_pct"]
+        d3 = derive(200.0, float(hi[200.0]["Q_uLs"]), _R_TIP[330])["Dn_pct"]
         head[M] = 100 * (d3 - d2) / d2
 
     out, dt_all, dq_all = {}, [], []
@@ -153,8 +167,8 @@ def read_pairs():
         p, ddt = [], []
         for pk in shared:
             qa, qb = float(a[pk]["Q_uLs"]), float(b[pk]["Q_uLs"])
-            da = derive(pk, qa, _R_TIP[d])["Dt_pct"]
-            db = derive(pk, qb, _R_TIP[d])["Dt_pct"]
+            da = derive(pk, qa, _R_TIP[d])["Dn_pct"]
+            db = derive(pk, qb, _R_TIP[d])["Dn_pct"]
             p.append(pk)
             ddt.append(abs(db - da))
             dt_all += [da, db]
@@ -185,8 +199,11 @@ def _target_q():
 
 
 def _read_bagley_series(name):
-    path = _BAGLEY_DIR / name
-    require(path, f"Bagley series {name}")
+    return _read_bagley_series_at(_BAGLEY_DIR / name)
+
+
+def _read_bagley_series_at(path):
+    require(path, f"Bagley series {path.name}")
     with open(path) as fh:
         return [{k: (float(v) if v not in ("", None) else None) for k, v in r.items()}
                 for r in csv.DictReader(fh)]

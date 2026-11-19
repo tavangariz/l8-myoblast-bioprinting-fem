@@ -1,4 +1,4 @@
-<h1 align="center">Fast computational screening of extrusion bioprinting</h1>
+<h1 align="center">Computational screening of extrusion bioprinting</h1>
 
 <p align="center">
   <b>Finite element model and Gaussian process surrogate for skeletal myoblasts in alginate hydrogel</b>
@@ -18,7 +18,7 @@
 
 Code and data for the article:
 
-> **Fast computational screening of extrusion parameters for bioprinting of skeletal myoblasts in alginate hydrogel**<br>
+> **Computational screening of nozzle diameter and applied pressure for extrusion bioprinting of L8 skeletal myoblasts in alginate hydrogel**<br>
 > Zahed Tavangari, Ali Maghami, Antonio Papangelo, Giada Graziana Genchi<br>
 > *BMC Biomedical Materials Science* (submitted)
 
@@ -26,10 +26,11 @@ Code and data for the article:
 
 - **Flow.** An axisymmetric finite element model (DOLFINx) of a shear-thinning L8 myoblast suspension in
   1.5% alginate, from the cartridge through the nozzle, with inertia.
-- **Damage.** Predicted cell damage split into shear along the nozzle and extension at the nozzle entrance.
+- **Damage.** Predicted cell damage split into shear along the nozzle and extension at the nozzle entrance,
+  with a pressure-independent term fitted to the damage Ning *et al.* (2018) measured.
 - **Surrogate.** Gaussian processes trained on 32 nozzle–pressure cases return flow rate and damage for any
   nozzle diameter (100–330 µm) and pressure (25–400 kPa) in under a millisecond, and draw the operating
-  window: damage below 20% at a flow rate of at least 1 µL/s.
+  window: total damage below 20% at a flow rate of at least 1 µL/s.
 
 ## Quick start
 
@@ -41,7 +42,7 @@ python scripts/fig7_operating_window.py        # writes results/figures/
 ```
 
 The figure and analysis scripts read the solved cases in `results/` and need no solver; they were run with
-Python 3.13, NumPy 2.2, SciPy 1.15, scikit-learn 1.7, Matplotlib 3.10 and Gmsh 4.15. To re-run the finite
+Python 3.12 and 3.13, NumPy 2.2, SciPy 1.15, scikit-learn 1.7, Matplotlib 3.10 and Gmsh 4.15. To re-run the finite
 element campaign (about 1.5 h per case), use the DOLFINx image: `docker compose --profile fem up fem-sweep`.
 
 ## Reproducing the figures
@@ -56,11 +57,41 @@ element campaign (about 1.5 h per case), use the DOLFINx image: `docker compose 
 | Fig. 6 | `fig6_surrogate_surfaces.py` |
 | Fig. 7 | `fig7_operating_window.py` |
 | Fig. 8 | `fig8_contraction_flow.py` |
-| Figs. S1–S3 | `figS1_blocked_holdouts.py`, `figS2_model_checks.py`, `figS3_interval_calibration.py` |
+| Additional file 1, Figs. S1–S3 | `figS1_blocked_holdouts.py`, `figS2_model_checks.py`, `figS3_interval_calibration.py` |
+| Additional file 2, Fig. S4 | `figS4_viscosity.py` |
 
 Table 1 and the numbers in the text come from `table1_comparison.py`, `matched_flow.py`, `inertia.py` and
 `reference_condition.py`; the supplementary tables from `build_supplementary_tables.py`,
-`surrogate_validation.py` and `evaluate_fem_checks.py`.
+`surrogate_validation.py`, `evaluate_fem_checks.py` and `evaluate_boundary_checks.py`.
+
+## Analyses of Additional file 2
+
+| Section | Script | Output in `results/analyses/` |
+|---|---|---|
+| S8 Calibration of the damage law against measured damage | `l8_calibration.py` | `calibration_variants.json` |
+| S9 Robustness of the operating window | `window_analyses.py`, `boundary_sensitivity.py`, `extra_numbers.py`, `friction_accuracy.py` | `window_analyses.json`, `d0_uncertainty_boundary.json`, `measured_flow_operating_points.json`, `extra_numbers.json`, `friction_accuracy.json` |
+| S10 Sensitivity of the tracer statistics | `tracking_sensitivity.py`, `tracking_convergence.py` | `tracking_sensitivity.json`, `tracking_tracers.csv`, `tracking_convergence.json` |
+| S11 The surrogate against interpolants of the same data | `surrogate_benchmark.py`, `surrogate_benchmark_per_check.py`, `kernel_window_sensitivity.py` | `surrogate_benchmark.json`, `surrogate_benchmark_per_check.json`, `kernel_window_sensitivity.json` |
+| S12 The entrance stress against the resolved flow | `entrance_proxy.py` | `entrance_proxy.json` |
+| S13 The same pipeline for RSC96 Schwann cells | `rsc96_transfer.py` | `rsc96_transfer.json` |
+
+The four FEM checks of the 20% limit on the total damage (Additional file 1, Table S5) were fixed by
+`prespecify_boundary_checks.py` before any of them was solved. They are compared with the surrogate by
+`evaluate_boundary_checks.py`. The script `entrance_proxy.py` reads two solved fields that are not distributed
+for their size; its output is included. The values digitised from the figures of Ning *et al.* (2018) are in
+`ning2018_data.py`. The bound on the effect of the upper viscosity limit (Additional file 1, Section S1) is
+computed by `viscosity_cap.py` into `viscosity_cap.json`; the Bagley sweeps at the operating flow are in
+`results/fem/runs/2026-11-04_bagley-operating`.
+
+In `results/surrogate/fold_predictions.csv` the columns `Dt_fem_pct`, `Dt_pred_pct` and `Dt_sd_pp` keep the
+names of release 1.0.0 and hold the condition-dependent damage Dn, the quantity the surrogate emulates. The
+total damage Dt of the article follows from it by Eq. 25, Dt = D0 + (1 − D0) Dn, so an error on Dt is (1 − D0)
+times the error on Dn.
+
+The paths of the 168 tracers of Fig. 5 ship in `tracking_published_paths_cache.npz`, so the figure is redrawn
+from the tracks of `tracking_tracers.csv`. Tracked again with 100-fold tighter integration tolerances, the
+radii in the nozzle move by at most 0.005 µm and the shear damage of a tracer by at most 0.0003 percentage
+points (`tracking_convergence.json`).
 
 ## Repository layout
 
@@ -69,13 +100,14 @@ scripts/              solver, damage law, surrogate and one script per figure
 scripts/validation/   comparisons with published flow and damage data
 results/fem/          the 32 solved cases, per-case solver output, reference-condition field
 results/surrogate/    surrogate validation
+results/analyses/     analyses of Additional file 2, caption numbers of Fig. 5
 ```
 
 ## Citation
 
 ```bibtex
 @article{tavangari2026bioprinting,
-  title   = {Fast computational screening of extrusion parameters for bioprinting of skeletal myoblasts in alginate hydrogel},
+  title   = {Computational screening of nozzle diameter and applied pressure for extrusion bioprinting of L8 skeletal myoblasts in alginate hydrogel},
   author  = {Tavangari, Zahed and Maghami, Ali and Papangelo, Antonio and Genchi, Giada Graziana},
   journal = {BMC Biomedical Materials Science},
   note    = {Submitted},

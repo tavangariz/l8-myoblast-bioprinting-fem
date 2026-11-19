@@ -4,22 +4,26 @@
 derive(P_kPa, Q_uLs, R) takes the applied pressure, the solved flow rate and the nozzle radius and
 returns the wall shear stress (Rabinowitsch relation, Eq. 16), the entrance pressure (Eq. 17), the
 effective extensional stress (Eq. 22), the shear damage averaged over the nozzle cross-section
-(Eqs. 18-21), the extensional damage (Eq. 23) and the total damage (Eq. 24). Every damage value in
-the article comes from this function; the module reads no files.
+(Eqs. 18-21), the entrance damage (Eq. 23), the condition-dependent damage Dn (Eq. 24) and the
+total damage Dt = D0 + (1 - D0) Dn (Eq. 25). shear_damage_at(r, dP_tip, R) gives the shear damage
+of a cell at one radius (Eq. 20). Every damage value in the article comes from this module; it
+reads no files.
 
 Reference condition, 200 µm nozzle at 200 kPa:
 
     derive(200.0, 17.940002925163476, 100e-6)
       tau_w    981.2178 Pa      dP_tip   196.2436 kPa
       P_en       3.7564 kPa     tau_ext 1901.6964 Pa
-      Dst        0.2864 %       Det        8.6948 %      Dt   8.9563 %
+      Dst        0.2864 %       Det        8.6948 %
+      Dn         8.9563 %       Dt        13.1911 %
 
 Running the file checks this row.
 
 Parameters, from Ning et al. (2018): K and n, consistency and flow-behavior index of the L8
 suspension; RHO, its density; LTIP, nozzle length (10 mm); A1, B1, C1, shear-damage coefficients
-fitted over 100-1000 Pa and 10-120 s; A2, B2, extensional-damage coefficients fitted over
-440-9251 Pa.
+fitted over 100-1000 Pa and 10-120 s; A2, B2, entrance-damage coefficients fitted over
+440-9251 Pa. D0, the damage that depends on neither pressure nor nozzle diameter, is fitted by
+l8_calibration.py to the damage Ning et al. measured through the 200 µm nozzle (4.65 ± 1.17 %).
 """
 from __future__ import annotations
 
@@ -27,15 +31,23 @@ import math
 
 import numpy as np
 
-from l8_geometry import TIP_RADIUS_M  # noqa: F401  (re-exported for callers)
+from l8_geometry import L_NEEDLE, TIP_RADIUS_M  # noqa: F401  (TIP_RADIUS_M re-exported for callers)
 
 # Fluid and geometry. Unchanged for the life of the study.
 K_VIS, N_EXP, RHO = 25.60, 0.35, 990.0
-LTIP = 10e-3
+LTIP = L_NEEDLE
 
 # Ning 2018 damage law.
 A1, B1, C1 = 3.20e-4, 0.61, 0.52
 A2, B2 = 1.43e-3, 0.55
+
+# Pressure-independent damage D0 (Eq. 25). With the shear branch integrated exactly (Eq. 21), the
+# published a2, b2 under-predict the damage Ning measured through the 200 um needle at 50-400 kPa by
+# 2.1-6.6 percentage points, the shear estimate Ning subtracted before fitting a2, b2. D0 is that gap,
+# fitted by l8_calibration.py to the same four measurements (variant O, 4.65 +/- 1.17 %), and enters
+# the cascade as a third factor: Dt = 1 - (1 - D0)(1 - Det)(1 - Dst). It depends on neither pressure
+# nor diameter, so every comparison between conditions is carried by Dn = Det + (1 - Det) Dst.
+D0 = 0.04651339364937563
 
 # The calibrated box the coefficients were fitted inside. Reported alongside every damage
 # value so a reader can see which predictions interpolate and which extrapolate.
@@ -65,6 +77,16 @@ def velocity_profile(dP_tip: float, R: float, r):
     C = (dP_tip / (2 * K_VIS * LTIP)) ** (1 / N_EXP)
     alpha = (N_EXP + 1) / N_EXP
     return (N_EXP / (N_EXP + 1)) * C * (R ** alpha - np.asarray(r, float) ** alpha)
+
+
+def shear_damage_at(r, dP_tip: float, R: float):
+    """Shear damage D_s of a cell travelling the nozzle at radius `r` (Eq. 20 of the main text): the stress
+    dP_tip r / (2 L) held for the residence time L / v_z(r). It is the integrand of `compute_Dst` (Eq. 21) and of
+    `compute_Dst_flux` (Eq. S9), so its area and flow averages are those two quantities."""
+    r = np.asarray(r, float)
+    tau_s = dP_tip * r / (2 * LTIP)
+    V_r = np.maximum(velocity_profile(dP_tip, R, r), 1e-14)
+    return np.where(tau_s < 1e-12, 0.0, 1.0 - np.exp(-A1 * tau_s ** B1 * (LTIP / V_r) ** C1))
 
 
 def compute_Dst(dP_tip: float, R: float) -> float:
@@ -167,23 +189,25 @@ def derive(P_kPa: float, Q_uLs: float, R: float) -> dict:
     Dst = compute_Dst(dP_tip, R)
     Dst_Q = compute_Dst_flux(dP_tip, R, Q_uLs)
     Det = compute_Det(tau_ext)
-    Dt = (Det + (1 - Det) * Dst) * 100.0
+    Dn = Det + (1 - Det) * Dst
+    Dt = (D0 + (1 - D0) * Dn) * 100.0
     u_mean = (Q_uLs * 1e-9) / (math.pi * R ** 2)
     eta_w = K_VIS * (u_mean / R) ** (N_EXP - 1) if u_mean > 1e-12 else float("inf")
     Re = RHO * u_mean * 2 * R / eta_w if u_mean > 1e-12 else 0.0
     return dict(tau_w_Pa=tw, dP_tip_kPa=dP_tip / 1e3, P_en_kPa=P_en / 1e3,
                 tau_ext_Pa=tau_ext, Dst_pct=Dst * 100, Det_pct=Det * 100,
-                Dt_pct=Dt, Re=Re,
+                Dn_pct=Dn * 100.0, Dt_pct=Dt, Re=Re,
                 Dst_flux_pct=Dst_Q * 100,
                 shear_box_frac=calibration_fraction(dP_tip, R, Q_uLs),
                 ext_in_box=int(EXT_BOX_TAU_PA[0] <= tau_ext <= EXT_BOX_TAU_PA[1]))
 
 
-REFERENCE = dict(P_kPa=200.0, Q_uLs=17.940002925163476, R=100e-6,
+REFERENCE = dict(P_kPa=200.0, Q_uLs=17.940002925163476, R=TIP_RADIUS_M[200],
                  tau_w_Pa=981.2178136160567, dP_tip_kPa=196.24356272321134,
                  P_en_kPa=3.756437276788667, tau_ext_Pa=1901.696371374263,
                  Dst_pct=0.28642409650113515, Det_pct=8.694829839414187,
-                 Dt_pct=8.956349848105468)
+                 Dn_pct=8.956349848105468,
+                 Dt_pct=100 * (D0 + (1 - D0) * 0.08956349848105468))
 
 
 def _self_test() -> int:

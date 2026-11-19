@@ -25,6 +25,9 @@ GEOM = {
     "z3":   22.0e-3,   # L_c1 + L, needle outlet
 }
 
+# Needle length L of Ning's Fig. 1 (z3 - z2), stated once so scripts need not take a float difference.
+L_NEEDLE = 10e-3
+
 # Tip radii the study sweeps, keyed by tip diameter in micrometres.
 TIP_RADIUS_M = {100: 50e-6, 200: 100e-6, 250: 125e-6, 330: 165e-6}
 
@@ -65,6 +68,8 @@ def _self_test():
         assert abs(got - want) < 1e-9, f"z={z}: got {got}, want {want}"
     zz, rr = profile_points(g)
     assert len(zz) == 5 and zz[2] == zz[3], "the contraction must be one step"
+    assert abs(GEOM["z3"] - GEOM["z2"] - L_NEEDLE) < 1e-12, "L_NEEDLE must equal z3 - z2"
+    assert GEOM["Rtip"] == TIP_RADIUS_M[200], "the reference tip is the 200 um one"
     print("l8_geometry self-test: OK")
 
 

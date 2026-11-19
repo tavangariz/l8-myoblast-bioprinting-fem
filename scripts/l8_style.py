@@ -70,12 +70,13 @@ LBL = {
     "pressure":   "Applied pressure (kPa)",
     "diameter":   "Nozzle diameter (µm)",
     "entry_r":    "Nozzle entry radius (µm)",
+    "noz_r":      "Radius in the nozzle (µm)",
     "axial_z":    "Axial position  $z$  (mm)",
     "radius_mm":  "Radius  $r$  (mm)",
     "radius_um":  "Radius  $r$  (µm)",
     "flow_q":     "Flow rate  $Q$  (µL/s)",   # the text and every key write µL/s
     "damage_t":   "Total damage  $D_t$  (%)",
-    "damage_cum": "Cumulative  $D_t$  (%)",
+    "damage_cum": "Cumulative  $D_n$  (%)",
 }
 
 # Panel labels: a bold capital, on its own, outside the axes.

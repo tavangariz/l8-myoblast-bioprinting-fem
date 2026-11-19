@@ -1,0 +1,30 @@
+# Solved fields at two points of the 20 % limit on the total damage, for the comparison of the
+# entrance stress derived from the pressure with the resolved flow (entrance_proxy.py). Same solver,
+# image and settings as the canonical grid; the field of each case is saved with L8_VIZ_CKPT.
+universe                = vanilla
+getenv                  = True
+should_transfer_files   = YES
+transfer_executable     = False
+when_to_transfer_output = ON_EXIT
+
+executable = /usr/bin/apptainer
+
+request_cpus   = 1
+request_memory = 12 GB
+request_disk   = 12 GB
+
+arguments = "exec $ENV(HOME)/htcondor/images/l8-fem.sif python3 -u $ENV(HOME)/l8-fem/scripts/fem_bagley_inertia_2026-07-30.py"
+
+RUNDIR = $ENV(HOME)/l8-fem/results/fem/runs/2026-10-31_boundary-fields
+TAG    = M$(MESH)_D$(DIA)_P$(PRESS)
+
+environment = "L8_GEOM=ning L8_EPS_AX=1e-12 L8_MESH_M=$(MESH) L8_INERTIA=1 L8_NEEDLES=$(DIA) L8_PRESSURES=$(PRESS) L8_LTIP=10e-3 L8_VIZ_CKPT=$(RUNDIR)/$(TAG).pkl L8_VIZ_P_KPA=$(PRESS) L8_CSV_OUT=$(RUNDIR)/$(TAG).csv MPLBACKEND=Agg OMP_NUM_THREADS=1"
+
+output = $(RUNDIR)/logs/$(TAG).out
+error  = $(RUNDIR)/logs/$(TAG).err
+log    = $(RUNDIR)/logs/$(TAG).log
+
+queue MESH, DIA, PRESS from (
+  12, 250, 263
+  12, 330, 186.3
+)

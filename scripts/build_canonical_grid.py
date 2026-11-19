@@ -3,8 +3,10 @@
 
 Reads the per-case solver files in results/fem/runs/2026-08-26_ning-grid32 (meshes M12 and M16)
 and the Bagley series in results/fem/runs/2026-08-27_bagley-ning, reduces every case through
-l8_damage.derive, and writes results/fem/exports/L8_FEM_canonical_2026-08-27.csv, the grid the
-results of the article are read from.
+l8_damage.derive, and writes results/fem/exports/L8_FEM_canonical_2026-10-31.csv, the grid the
+results of the article are read from. Each case carries the condition-dependent damage Dn (Eq. 24)
+and the total damage Dt, which adds the pressure-independent damage D0 (Eq. 25). The grid of release
+1.0.0, without D0, stays in L8_FEM_canonical_2026-08-27.csv (l8_paths.CANONICAL_GRID_V1).
 
 Nothing is written unless three checks pass: the damage law reproduces its reference row, the
 entrance pressure agrees with a Bagley extrapolation to zero nozzle length within 3 % for every
@@ -29,7 +31,7 @@ from l8_paths import DATA, require                # noqa: E402
 
 RUNS = DATA / "fem" / "runs"
 EXPORTS = DATA / "fem" / "exports"
-OUT = EXPORTS / "L8_FEM_canonical_2026-08-27.csv"
+OUT = EXPORTS / "L8_FEM_canonical_2026-10-31.csv"
 
 GRID = RUNS / "2026-08-26_ning-grid32"
 BAGLEY = RUNS / "2026-08-27_bagley-ning"
@@ -137,7 +139,7 @@ def main() -> int:
         seen.add(key)
 
     cols = ["needle_um", "pressure_kPa", "mesh_M", "inertia", "Q_uLs", "Re", "tau_w_Pa",
-            "dP_tip_kPa", "P_en_kPa", "tau_ext_Pa", "Dst_pct", "Det_pct", "Dt_pct",
+            "dP_tip_kPa", "P_en_kPa", "tau_ext_Pa", "Dst_pct", "Det_pct", "Dn_pct", "Dt_pct",
             "pen_bagley_kPa", "pen_gate_pct", "source"]
     EXPORTS.mkdir(parents=True, exist_ok=True)
     with open(OUT, "w", newline="") as f:

@@ -1,0 +1,230 @@
+{
+ "per_nozzle": {
+  "100.0": {
+   "bagley_kPa": 1.67,
+   "residual_kPa": 1.667,
+   "friction_kPa": 198.3,
+   "diff_pct_of_bagley": -0.21,
+   "diff_pct_of_friction": -0.002,
+   "two_tip_intercepts_kPa": [
+    1.671,
+    1.669
+   ]
+  },
+  "200.0": {
+   "bagley_kPa": 3.695,
+   "residual_kPa": 3.756,
+   "friction_kPa": 196.2,
+   "diff_pct_of_bagley": 1.65,
+   "diff_pct_of_friction": 0.031,
+   "two_tip_intercepts_kPa": [
+    3.666,
+    3.724
+   ]
+  },
+  "250.0": {
+   "bagley_kPa": 5.832,
+   "residual_kPa": 5.865,
+   "friction_kPa": 194.1,
+   "diff_pct_of_bagley": 0.58,
+   "diff_pct_of_friction": 0.017,
+   "two_tip_intercepts_kPa": [
+    5.808,
+    5.855
+   ]
+  },
+  "330.0": {
+   "bagley_kPa": 15.555,
+   "residual_kPa": 15.301,
+   "friction_kPa": 184.7,
+   "diff_pct_of_bagley": -1.63,
+   "diff_pct_of_friction": -0.137,
+   "two_tip_intercepts_kPa": [
+    15.521,
+    15.588
+   ]
+  }
+ },
+ "max_abs_diff_pct_of_friction_three_tip": 0.137,
+ "max_abs_diff_pct_of_friction": 0.156,
+ "max_abs_diff_nozzle_um": 330.0,
+ "one_pct_over_max": 6.4,
+ "smallest_loss_threshold_pct": 0.54,
+ "smallest_threshold_over_max": 3.5,
+ "orderings_with_bagley_friction": {
+  "matched_1.0": {
+   "diam_um": [
+    100.0,
+    200.0,
+    250.0,
+    330.0
+   ],
+   "base": [
+    11.83,
+    9.92,
+    9.48,
+    9.03
+   ],
+   "bagley": [
+    11.84,
+    9.88,
+    9.46,
+    9.12
+   ],
+   "ordering_holds": true,
+   "holds_any_signs_at_max": true
+  },
+  "matched_17.94": {
+   "diam_um": [
+    200.0,
+    250.0,
+    330.0
+   ],
+   "base": [
+    13.19,
+    12.16,
+    11.22
+   ],
+   "bagley": [
+    13.12,
+    12.13,
+    11.37
+   ],
+   "ordering_holds": true,
+   "holds_any_signs_at_max": true
+  },
+  "fixed_200kPa": {
+   "diam_um": [
+    100.0,
+    200.0,
+    250.0,
+    330.0
+   ],
+   "base": [
+    10.72,
+    13.19,
+    15.29,
+    21.81
+   ],
+   "bagley": [
+    10.72,
+    13.12,
+    15.26,
+    21.95
+   ],
+   "ordering_holds": true,
+   "holds_any_signs_at_max": true
+  }
+ },
+ "orderings_kept": 3,
+ "orderings_kept_worst_case": 3,
+ "minimum_100um_with_bagley_friction": {
+  "P_kPa": 75.0,
+  "interior": true,
+  "at_minus_max": {
+   "P_kPa": 50.0,
+   "interior": true
+  },
+  "at_plus_max": {
+   "P_kPa": 75.0,
+   "interior": true
+  }
+ },
+ "rsc96_matched_flow_l8_bagley_applied": {
+  "diam_um": [
+   100.0,
+   200.0,
+   250.0,
+   330.0
+  ],
+  "base": [
+   13.86,
+   10.87,
+   10.15,
+   9.88
+  ],
+  "bagley": [
+   13.87,
+   10.81,
+   10.12,
+   10.0
+  ],
+  "decrease_holds_bagley": true,
+  "worst_case_swapped_pairs": [
+   "250-330"
+  ],
+  "worst_case_swapped_values": {
+   "250-330": [
+    9.95,
+    10.02
+   ]
+  }
+ },
+ "operating_flow_1uLs": {
+  "per_nozzle": {
+   "100.0": {
+    "P_op_kPa": 298.37,
+    "bagley_kPa": 2.496,
+    "residual_kPa": 2.521,
+    "friction_kPa": 295.85,
+    "two_tip_intercepts_kPa": [
+     2.499,
+     2.492
+    ],
+    "diff_pct_of_friction": 0.009,
+    "any_fit_pct_of_friction": 0.01
+   },
+   "200.0": {
+    "P_op_kPa": 72.7,
+    "bagley_kPa": 1.261,
+    "residual_kPa": 1.262,
+    "friction_kPa": 71.44,
+    "two_tip_intercepts_kPa": [
+     1.262,
+     1.261
+    ],
+    "diff_pct_of_friction": 0.001,
+    "any_fit_pct_of_friction": 0.001
+   },
+   "250.0": {
+    "P_op_kPa": 46.24,
+    "bagley_kPa": 1.022,
+    "residual_kPa": 1.022,
+    "friction_kPa": 45.22,
+    "two_tip_intercepts_kPa": [
+     1.021,
+     1.022
+    ],
+    "diff_pct_of_friction": 0.0,
+    "any_fit_pct_of_friction": 0.0
+   },
+   "330.0": {
+    "P_op_kPa": 26.38,
+    "bagley_kPa": 0.791,
+    "residual_kPa": 0.791,
+    "friction_kPa": 25.59,
+    "two_tip_intercepts_kPa": [
+     0.791,
+     0.791
+    ],
+    "diff_pct_of_friction": -0.001,
+    "any_fit_pct_of_friction": 0.001
+   }
+  },
+  "nozzles_pending_um": [],
+  "max_abs_diff_pct_of_friction": 0.01,
+  "max_abs_diff_nozzle_um": 100.0,
+  "ordering_1uLs_with_op_bagley": {
+   "bagley": [
+    11.8,
+    9.92,
+    9.48,
+    9.03
+   ],
+   "ordering_holds": true
+  },
+  "ordering_1uLs_any_signs_at_op_max": true
+ },
+ "operating_max_over_200kPa_max": 0.1,
+ "smallest_threshold_over_operating_max": 54.0
+}

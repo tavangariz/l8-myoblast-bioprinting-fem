@@ -1,0 +1,253 @@
+{
+ "area_average_Dst_pct": 0.2864,
+ "D_e_pct": 8.6948,
+ "readout": "shear damage of Eq. 20 at the median radius over the nozzle beyond its first 1 mm",
+ "ode_rtol": 1e-08,
+ "ode_atol": 1e-13,
+ "sets": [
+  {
+   "set": "published: first 168 survivors, 0.95 R_in",
+   "seeded": 168,
+   "kept": 168,
+   "dropped": 0,
+   "dropped_by_reason": {},
+   "dropped_release_radius_mm": [],
+   "dropped_end_points": [],
+   "outermost_nozzle_r_over_R": 0.9527,
+   "mean_Dst_pct": 0.2213,
+   "p95_Dst_pct": 0.4391,
+   "max_Dst_pct": 0.5106,
+   "Dt_spread_pp": 0.4203
+  },
+  {
+   "set": "all survivors of 1000, 0.95 R_in",
+   "seeded": 1000,
+   "kept": 1000,
+   "dropped": 0,
+   "dropped_by_reason": {},
+   "dropped_release_radius_mm": [],
+   "dropped_end_points": [],
+   "outermost_nozzle_r_over_R": 0.954,
+   "mean_Dst_pct": 0.2141,
+   "p95_Dst_pct": 0.4518,
+   "max_Dst_pct": 0.518,
+   "Dt_spread_pp": 0.4439
+  },
+  {
+   "set": "all survivors of 1000, 0.99 R_in",
+   "seeded": 1000,
+   "kept": 970,
+   "dropped": 30,
+   "dropped_by_reason": {
+    "stopped on the contraction face": 30
+   },
+   "dropped_release_radius_mm": [
+    2.045,
+    2.046,
+    2.048,
+    2.048,
+    2.05,
+    2.051,
+    2.053,
+    2.053,
+    2.053,
+    2.054,
+    2.054,
+    2.058,
+    2.058,
+    2.058,
+    2.059,
+    2.06,
+    2.061,
+    2.061,
+    2.061,
+    2.068,
+    2.069,
+    2.069,
+    2.069,
+    2.072,
+    2.072,
+    2.073,
+    2.075,
+    2.076,
+    2.078,
+    2.079
+   ],
+   "dropped_end_points": [
+    [
+     12.0,
+     100.26
+    ],
+    [
+     12.0,
+     105.35
+    ],
+    [
+     12.0,
+     102.3
+    ],
+    [
+     12.0,
+     105.46
+    ],
+    [
+     12.0,
+     101.98
+    ],
+    [
+     12.0,
+     103.23
+    ],
+    [
+     12.0,
+     104.02
+    ],
+    [
+     12.0,
+     101.22
+    ],
+    [
+     12.0,
+     101.42
+    ],
+    [
+     12.0,
+     104.16
+    ],
+    [
+     12.0,
+     102.12
+    ],
+    [
+     12.0,
+     100.88
+    ],
+    [
+     12.0,
+     100.63
+    ],
+    [
+     12.0,
+     104.7
+    ],
+    [
+     12.0,
+     100.28
+    ],
+    [
+     12.0,
+     103.39
+    ],
+    [
+     12.0,
+     102.26
+    ],
+    [
+     12.0,
+     101.96
+    ],
+    [
+     12.0,
+     101.29
+    ],
+    [
+     12.0,
+     101.92
+    ],
+    [
+     12.0,
+     101.97
+    ],
+    [
+     12.0,
+     101.39
+    ],
+    [
+     12.0,
+     102.27
+    ],
+    [
+     12.0,
+     104.04
+    ],
+    [
+     12.0,
+     103.44
+    ],
+    [
+     12.0,
+     104.6
+    ],
+    [
+     12.0,
+     103.47
+    ],
+    [
+     12.0,
+     100.98
+    ],
+    [
+     12.0,
+     101.25
+    ],
+    [
+     12.0,
+     100.67
+    ]
+   ],
+   "outermost_nozzle_r_over_R": 0.9724,
+   "mean_Dst_pct": 0.2295,
+   "p95_Dst_pct": 0.5161,
+   "max_Dst_pct": 0.6731,
+   "Dt_spread_pp": 0.6028
+  },
+  {
+   "set": "all survivors of 1000, flux-weighted, 0.99 R_in",
+   "seeded": 1000,
+   "kept": 994,
+   "dropped": 6,
+   "dropped_by_reason": {
+    "stopped on the contraction face": 6
+   },
+   "dropped_release_radius_mm": [
+    2.048,
+    2.053,
+    2.056,
+    2.056,
+    2.061,
+    2.061
+   ],
+   "dropped_end_points": [
+    [
+     12.0,
+     101.23
+    ],
+    [
+     12.0,
+     100.61
+    ],
+    [
+     12.0,
+     101.62
+    ],
+    [
+     12.0,
+     102.28
+    ],
+    [
+     12.0,
+     102.33
+    ],
+    [
+     12.0,
+     101.68
+    ]
+   ],
+   "outermost_nozzle_r_over_R": 0.9703,
+   "mean_Dst_pct": 0.1827,
+   "p95_Dst_pct": 0.3722,
+   "max_Dst_pct": 0.6485,
+   "Dt_spread_pp": 0.5699
+  }
+ ]
+}

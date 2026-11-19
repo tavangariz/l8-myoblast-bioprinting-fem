@@ -153,6 +153,9 @@ for _lab, _val in (("$L_{c2}$ = 10.5 mm", Lc2), ("$L_{c1}$ = 12.0 mm", Lc1),
     assert abs(_num - _val * MM) < 1e-9, f"drawn {_lab} != solver {_val * MM} mm"
 print("  dimension labels checked against the solver geometry: 5/5 agree")
 
+axA.set_xlim(-7.20, 4.60)
+axA.set_ylim(z3 * MM + 2.2, -4.6)
+
 # The radial axis is deliberately exaggerated so a 22 mm flow path and a 0.1 mm bore can share one
 # panel.
 fig.canvas.draw()
@@ -161,9 +164,6 @@ _xr = axA.get_xlim()[1] - axA.get_xlim()[0]
 _yr = abs(axA.get_ylim()[1] - axA.get_ylim()[0])
 _exag = (_bb.width / _xr) / (_bb.height / _yr)
 print(f"  radial exaggeration for the caption: {_exag:.2f}x")
-
-axA.set_xlim(-7.20, 4.60)
-axA.set_ylim(z3 * MM + 2.2, -4.6)
 axA.set_axis_off()
 
 def draw_mesh(ax, xlim, ylim):

@@ -25,3 +25,7 @@ Thumbs.db
 
 # solver run manifest, written to the working directory
 MANIFEST.json
+# Fig. 5 track cache, rebuilt by scripts/tracking_sensitivity.py from the checkpoint;
+# the paths of the article ship
+results/analyses/*_cache.npz
+!results/analyses/tracking_published_paths_cache.npz

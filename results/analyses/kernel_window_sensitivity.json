@@ -1,0 +1,724 @@
+{
+ "variants": {
+  "Matern 5/2, 1e-6": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 298.5,
+     "op_kPa": 298.5,
+     "window_width_kPa": 101.5
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 133.2,
+     "op_kPa": 133.2,
+     "window_width_kPa": 266.8
+    },
+    "200.0": {
+     "damage_boundary_kPa": 343.9,
+     "flow_boundary_kPa": 72.7,
+     "op_kPa": 72.7,
+     "window_width_kPa": 271.1
+    },
+    "250.0": {
+     "damage_boundary_kPa": 263.0,
+     "flow_boundary_kPa": 46.5,
+     "op_kPa": 46.5,
+     "window_width_kPa": 216.4
+    },
+    "290.0": {
+     "damage_boundary_kPa": 217.3,
+     "flow_boundary_kPa": 35.0,
+     "op_kPa": 35.0,
+     "window_width_kPa": 182.2
+    },
+    "330.0": {
+     "damage_boundary_kPa": 186.3,
+     "flow_boundary_kPa": 26.6,
+     "op_kPa": 26.6,
+     "window_width_kPa": 159.6
+    }
+   },
+   "checks_in_window": [
+    true,
+    true,
+    false,
+    true,
+    false,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [],
+   "checks_differing_from_fem": 4,
+   "selected_nozzle": 330.0
+  },
+  "Matern 5/2, 1e-4": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 298.4,
+     "op_kPa": 298.4,
+     "window_width_kPa": 101.6
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 134.8,
+     "op_kPa": 134.8,
+     "window_width_kPa": 265.2
+    },
+    "200.0": {
+     "damage_boundary_kPa": 344.2,
+     "flow_boundary_kPa": 72.4,
+     "op_kPa": 72.4,
+     "window_width_kPa": 271.7
+    },
+    "250.0": {
+     "damage_boundary_kPa": 262.7,
+     "flow_boundary_kPa": 46.7,
+     "op_kPa": 46.7,
+     "window_width_kPa": 215.9
+    },
+    "290.0": {
+     "damage_boundary_kPa": 217.0,
+     "flow_boundary_kPa": 35.1,
+     "op_kPa": 35.1,
+     "window_width_kPa": 181.8
+    },
+    "330.0": {
+     "damage_boundary_kPa": 186.4,
+     "flow_boundary_kPa": 26.6,
+     "op_kPa": 26.6,
+     "window_width_kPa": 159.7
+    }
+   },
+   "checks_in_window": [
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [],
+   "checks_differing_from_fem": 5,
+   "selected_nozzle": 330.0
+  },
+  "Matern 5/2, 1e-2": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 294.5,
+     "op_kPa": 294.5,
+     "window_width_kPa": 105.5
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 134.9,
+     "op_kPa": 134.9,
+     "window_width_kPa": 265.1
+    },
+    "200.0": {
+     "damage_boundary_kPa": 336.6,
+     "flow_boundary_kPa": 77.3,
+     "op_kPa": 77.3,
+     "window_width_kPa": 259.2
+    },
+    "250.0": {
+     "damage_boundary_kPa": 256.2,
+     "flow_boundary_kPa": 49.0,
+     "op_kPa": 49.0,
+     "window_width_kPa": 207.1
+    },
+    "290.0": {
+     "damage_boundary_kPa": 213.6,
+     "flow_boundary_kPa": 34.2,
+     "op_kPa": 34.2,
+     "window_width_kPa": 179.3
+    },
+    "330.0": {
+     "damage_boundary_kPa": 183.8,
+     "flow_boundary_kPa": 25.0,
+     "op_kPa": 25.0,
+     "window_width_kPa": 158.7
+    }
+   },
+   "checks_in_window": [
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [
+    [
+     200.0,
+     75.0,
+     1.093
+    ],
+    [
+     330.0,
+     25.0,
+     0.857
+    ]
+   ],
+   "checks_differing_from_fem": 5,
+   "selected_nozzle": 330.0
+  },
+  "Matern 3/2, 1e-6": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 298.6,
+     "op_kPa": 298.6,
+     "window_width_kPa": 101.4
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 136.3,
+     "op_kPa": 136.3,
+     "window_width_kPa": 263.7
+    },
+    "200.0": {
+     "damage_boundary_kPa": 344.4,
+     "flow_boundary_kPa": 72.6,
+     "op_kPa": 72.6,
+     "window_width_kPa": 271.7
+    },
+    "250.0": {
+     "damage_boundary_kPa": 262.3,
+     "flow_boundary_kPa": 46.6,
+     "op_kPa": 46.6,
+     "window_width_kPa": 215.6
+    },
+    "290.0": {
+     "damage_boundary_kPa": 215.8,
+     "flow_boundary_kPa": 35.4,
+     "op_kPa": 35.4,
+     "window_width_kPa": 180.3
+    },
+    "330.0": {
+     "damage_boundary_kPa": 186.2,
+     "flow_boundary_kPa": 26.8,
+     "op_kPa": 26.8,
+     "window_width_kPa": 159.3
+    }
+   },
+   "checks_in_window": [
+    false,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [],
+   "checks_differing_from_fem": 8,
+   "selected_nozzle": 330.0
+  },
+  "Matern 3/2, 1e-4": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 298.4,
+     "op_kPa": 298.4,
+     "window_width_kPa": 101.6
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 136.6,
+     "op_kPa": 136.6,
+     "window_width_kPa": 263.4
+    },
+    "200.0": {
+     "damage_boundary_kPa": 344.3,
+     "flow_boundary_kPa": 72.5,
+     "op_kPa": 72.5,
+     "window_width_kPa": 271.7
+    },
+    "250.0": {
+     "damage_boundary_kPa": 262.2,
+     "flow_boundary_kPa": 46.7,
+     "op_kPa": 46.7,
+     "window_width_kPa": 215.4
+    },
+    "290.0": {
+     "damage_boundary_kPa": 215.8,
+     "flow_boundary_kPa": 35.4,
+     "op_kPa": 35.4,
+     "window_width_kPa": 180.3
+    },
+    "330.0": {
+     "damage_boundary_kPa": 186.2,
+     "flow_boundary_kPa": 26.7,
+     "op_kPa": 26.7,
+     "window_width_kPa": 159.4
+    }
+   },
+   "checks_in_window": [
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [],
+   "checks_differing_from_fem": 7,
+   "selected_nozzle": 330.0
+  },
+  "Matern 3/2, 1e-2": {
+   "per_diameter": {
+    "100.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 291.1,
+     "op_kPa": 291.1,
+     "window_width_kPa": 108.9
+    },
+    "150.0": {
+     "damage_boundary_kPa": null,
+     "flow_boundary_kPa": 136.6,
+     "op_kPa": 136.6,
+     "window_width_kPa": 263.4
+    },
+    "200.0": {
+     "damage_boundary_kPa": 339.3,
+     "flow_boundary_kPa": 76.2,
+     "op_kPa": 76.2,
+     "window_width_kPa": 263.0
+    },
+    "250.0": {
+     "damage_boundary_kPa": 258.0,
+     "flow_boundary_kPa": 49.1,
+     "op_kPa": 49.1,
+     "window_width_kPa": 208.8
+    },
+    "290.0": {
+     "damage_boundary_kPa": 214.5,
+     "flow_boundary_kPa": 34.8,
+     "op_kPa": 34.8,
+     "window_width_kPa": 179.6
+    },
+    "330.0": {
+     "damage_boundary_kPa": 184.3,
+     "flow_boundary_kPa": 25.0,
+     "op_kPa": 25.0,
+     "window_width_kPa": 159.2
+    }
+   },
+   "checks_in_window": [
+    true,
+    false,
+    false,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    false
+   ],
+   "grid_in_window": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    false,
+    false
+   ],
+   "grid_differing_from_fem": [
+    [
+     200.0,
+     75.0,
+     1.093
+    ],
+    [
+     330.0,
+     25.0,
+     0.857
+    ]
+   ],
+   "checks_differing_from_fem": 5,
+   "selected_nozzle": 330.0
+  }
+ },
+ "n_checks": 15,
+ "fem_in_window": [
+  true,
+  false,
+  false,
+  true,
+  false,
+  true,
+  false,
+  true,
+  true,
+  false,
+  true,
+  true,
+  false,
+  true,
+  true
+ ],
+ "fem_checks": [
+  {
+   "D": 100.0,
+   "P": 298.5,
+   "Dt_total_minus_limit_pp": -8.166,
+   "Q_above_limit_pct": 0.12
+  },
+  {
+   "D": 200.0,
+   "P": 72.7,
+   "Dt_total_minus_limit_pp": -10.081,
+   "Q_above_limit_pct": -0.02
+  },
+  {
+   "D": 200.0,
+   "P": 393.4,
+   "Dt_total_minus_limit_pp": 3.669,
+   "Q_above_limit_pct": 11273.42
+  },
+  {
+   "D": 250.0,
+   "P": 46.5,
+   "Dt_total_minus_limit_pp": -10.508,
+   "Q_above_limit_pct": 1.63
+  },
+  {
+   "D": 250.0,
+   "P": 299.6,
+   "Dt_total_minus_limit_pp": 3.725,
+   "Q_above_limit_pct": 18318.92
+  },
+  {
+   "D": 330.0,
+   "P": 26.6,
+   "Dt_total_minus_limit_pp": -10.955,
+   "Q_above_limit_pct": 2.35
+  },
+  {
+   "D": 330.0,
+   "P": 213.8,
+   "Dt_total_minus_limit_pp": 3.752,
+   "Q_above_limit_pct": 32878.43
+  },
+  {
+   "D": 150.0,
+   "P": 133.2,
+   "Dt_total_minus_limit_pp": -9.354,
+   "Q_above_limit_pct": 5.98
+  },
+  {
+   "D": 290.0,
+   "P": 35.0,
+   "Dt_total_minus_limit_pp": -10.738,
+   "Q_above_limit_pct": 6.43
+  },
+  {
+   "D": 290.0,
+   "P": 249.4,
+   "Dt_total_minus_limit_pp": 3.669,
+   "Q_above_limit_pct": 24950.49
+  },
+  {
+   "D": 150.0,
+   "P": 300.0,
+   "Dt_total_minus_limit_pp": -6.292,
+   "Q_above_limit_pct": 974.39
+  },
+  {
+   "D": 200.0,
+   "P": 343.9,
+   "Dt_total_minus_limit_pp": -0.148,
+   "Q_above_limit_pct": 7955.11
+  },
+  {
+   "D": 250.0,
+   "P": 263.0,
+   "Dt_total_minus_limit_pp": 0.037,
+   "Q_above_limit_pct": 13252.34
+  },
+  {
+   "D": 330.0,
+   "P": 186.3,
+   "Dt_total_minus_limit_pp": -0.006,
+   "Q_above_limit_pct": 23839.76
+  },
+  {
+   "D": 290.0,
+   "P": 217.3,
+   "Dt_total_minus_limit_pp": -0.135,
+   "Q_above_limit_pct": 17890.76
+  }
+ ],
+ "max_shift_against_reference": {
+  "damage_boundary_kPa_max_shift_solved": 7.3,
+  "damage_boundary_kPa_max_shift_unsolved": 3.7,
+  "flow_boundary_kPa_max_shift_solved": 7.4,
+  "flow_boundary_kPa_max_shift_unsolved": 3.4,
+  "op_kPa_max_shift_solved": 7.4,
+  "op_kPa_max_shift_unsolved": 3.4
+ },
+ "checks_differing_from_reference": {
+  "Matern 5/2, 1e-6": 0,
+  "Matern 5/2, 1e-4": 5,
+  "Matern 5/2, 1e-2": 3,
+  "Matern 3/2, 1e-6": 6,
+  "Matern 3/2, 1e-4": 5,
+  "Matern 3/2, 1e-2": 3
+ },
+ "selected_nozzle_by_setting": {
+  "Matern 5/2, 1e-6": 330.0,
+  "Matern 5/2, 1e-4": 330.0,
+  "Matern 5/2, 1e-2": 330.0,
+  "Matern 3/2, 1e-6": 330.0,
+  "Matern 3/2, 1e-4": 330.0,
+  "Matern 3/2, 1e-2": 330.0
+ }
+}

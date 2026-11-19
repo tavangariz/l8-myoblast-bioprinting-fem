@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Fig. 4: flow rate, wall shear stress and predicted damage against applied pressure.
 
-(A) Mass flow rate, with the flow rates weighed by Ning et al. (2018). (B) Nozzle wall shear
-stress, with the values they computed. (C) Total damage, with the 20 % damage limit. (D) Entrance
-and shear terms for the 200 µm nozzle. Reads the grid only, and stops if the grid no longer gives
-the values reported in the article.
+(A) Mass flow rate, with the flow rates weighed by Ning et al. (2018) through the 200 µm nozzle at
+50-400 kPa and, at 200 kPa, through the 250 and 330 µm nozzles (their Fig. 4D, digitised in
+ning2018_data.py). (B) Nozzle wall shear stress, with the values they computed. (C) Total damage,
+with the 20 % damage limit. (D) Entrance and shear terms of the condition-dependent damage Dn for
+the 200 µm nozzle. Reads the grid only, and stops if the grid no longer gives the values reported
+in the article.
 
     python scripts/fig4_pressure_dependence.py
 """
@@ -40,7 +42,7 @@ BREAKDOWN_TIP = 200             # panel (d) fixes one tip, so no diameter colour
 
 # The grid this figure is allowed to draw. If the CSV ever stops reproducing these, the
 # manuscript's own numbers have moved and the figure must not be regenerated silently.
-CHECK = {(200, 200.0): 8.956, (250, 200.0): 11.161, (330, 200.0): 18.000}
+CHECK = {(200, 200.0): 13.191, (250, 200.0): 15.294, (330, 200.0): 21.814}   # Dt with D0 (Eq. 25)
 TOL = 0.002
 
 
@@ -105,7 +107,13 @@ def main():
                     marker=S.dia_marker(d), ls="-", color=S.dia_color(d), lw=P["lw_data"], ms=P["ms"],
                     mec="white", mew=0.6, label=S.dia_label(d), zorder=3)
     ax.plot(sorted(NING_Q), [NING_Q[p] * 1e3 for p in sorted(NING_Q)],
-            label="Ning 2018, weighed $Q$", zorder=4, **S.NING_MARKER)
+            label="Ning et al.: weighed $Q$ (A), computed $\\tau_w$ (B)", zorder=4, **S.NING_MARKER)
+    # The flows Ning weighed at 200 kPa through the 250 and 330 um needles (their Fig. 4D, digitised
+    # in ning2018_data.py), the diameter-wise data the flow-rate comparison uses; same marker, since
+    # they are the same measurement.
+    import ning2018_data as N
+    for d, m in N.FLOW_DIAMETER_SERIES_200KPA_G_S["L8"].items():
+        ax.plot([200.0], [m * 1e3], zorder=4, **S.NING_MARKER)
     ax.set_xlabel(S.LBL["pressure"])
     ax.set_ylabel("Mass flow rate  ($\\times10^{-3}$ g s$^{-1}$)")
     S.panel_label(ax, "A")
@@ -117,7 +125,7 @@ def main():
                 marker=S.dia_marker(d), ls="-", color=S.dia_color(d), lw=P["lw_data"], ms=P["ms"],
                 mec="white", mew=0.6, label=S.dia_label(d), zorder=3)
     ax.plot(sorted(NING_TW), [NING_TW[p] for p in sorted(NING_TW)],
-            label="Ning 2018, Table 2 $\\tau_w$", zorder=4, **S.NING_MARKER)
+            label="_nolegend_", zorder=4, **S.NING_MARKER)   # one key entry for the one marker (named in panel A's label)
     ax.set_xlabel(S.LBL["pressure"])
     ax.set_ylabel("Nozzle wall shear stress  $\\tau_w$  (Pa)")
     S.panel_label(ax, "B")
@@ -131,7 +139,7 @@ def main():
                 mec="white", mew=0.6, zorder=3, label=S.dia_label(d))
         # Labelled by the key, not by boxes on the plot.
     ax.axhline(20, color=S.THRESHOLD, lw=1.1, ls="--", zorder=1,
-               label="$D_t$ = 20 % screening threshold")
+               label="$D_t$ = 20% damage limit")
     # The threshold is named in the key rather than printed across the panel.
     ax.set_xlabel(S.LBL["pressure"])
     ax.set_ylabel(S.LBL["damage_t"])
@@ -147,9 +155,9 @@ def main():
     ax.bar(x, dst, 0.62, color=S.COMP_C["shear"], edgecolor="white", linewidth=0.5,
            label="shear  $D_{st}$", zorder=2)
     ax.bar(x, det, 0.62, bottom=dst, color=S.COMP_C["extensional"], edgecolor="white",
-           linewidth=0.5, label="extensional  $D_{et}$", zorder=2)
-    ax.plot(x, [r["Dt_pct"] for r in rr], "o-", color=S.COMP_C["total"],
-            lw=P["lw_data"], ms=P["ms"] - 0.5, label="total  $D_t$", zorder=4)
+           linewidth=0.5, label="entrance  $D_{et}$", zorder=2)
+    ax.plot(x, [r["Dn_pct"] for r in rr], "o-", color=S.COMP_C["total"],
+            lw=P["lw_data"], ms=P["ms"] - 0.5, label="combined  $D_n$", zorder=4)
     ax.set_xticks(x)
     ax.set_xticklabels([f"{int(r['pressure_kPa'])}" for r in rr])
     ax.set_xlabel(S.LBL["pressure"])
@@ -158,7 +166,7 @@ def main():
     ax.legend(loc="upper left")
 
     # Reported as D_et / D_t, which is how the manuscript states it, not D_et/(D_st+D_et).
-    dt = np.array([r["Dt_pct"] for r in rr])
+    dt = np.array([r["Dn_pct"] for r in rr])      # share of the condition-dependent damage
     share = det / dt * 100
     print(f"  extensional share at Ø{BREAKDOWN_TIP} (D_et/D_t): "
           f"{share.min():.1f} % to {share.max():.1f} %")

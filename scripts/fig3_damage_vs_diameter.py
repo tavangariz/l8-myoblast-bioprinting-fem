@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Fig. 3: predicted damage against nozzle diameter at 200 kPa.
 
-(A) Total damage and (B) its entrance and nozzle-shear terms, read from the grid. (C) Shear rate at
-nozzle entry against entry radius for the 168 tracers at the reference condition (200 kPa, 200 µm),
-integrated through the solved field in results/fem/checkpoints/.
+(A) Total damage and (B) the entrance and nozzle-shear terms of the condition-dependent damage Dn,
+read from the grid. (C) Shear rate at nozzle entry against entry radius for the 168 tracers at the
+reference condition (200 kPa, 200 µm), integrated through the solved field in
+results/fem/checkpoints/.
 
     python scripts/fig3_damage_vs_diameter.py
 """
@@ -40,6 +41,7 @@ def main():
     dt = {d: float(by[d]["Dt_pct"]) for d in TIPS}
     det = {d: float(by[d]["Det_pct"]) for d in TIPS}
     dst = {d: float(by[d]["Dst_pct"]) for d in TIPS}
+    dn = {d: float(by[d]["Dn_pct"]) for d in TIPS}     # condition-dependent part; Dt adds D0 (Eq. 25)
 
     # Through rc(), not A hand-built rcParams dict, so weight, box, line width and tick colour come
     # from the house style exactly as in every other figure.
@@ -83,14 +85,14 @@ def main():
           lw=0.7, label="shear  $D_{st}$")
     b.bar(x, [det[d] for d in TIPS], 0.58, bottom=[dst[d] for d in TIPS],
           color=S.COMP_C["extensional"], edgecolor="#333333", lw=0.7,
-          label="extensional  $D_{et}$")
+          label="entrance  $D_{et}$")
     b.set_xticks(list(x)); b.set_xticklabels([str(d) for d in TIPS])
-    b.set_ylim(0, max(dt.values()) * 1.30)
+    b.set_ylim(0, max(dn.values()) * 1.30)
     b.set_ylabel(f"Damage at {P_REF:.0f} kPa (%)")
     b.set_xlabel(S.LBL["diameter"])
     S.panel_label(b, "B")
     print("  caption numbers  ·  " + "  ".join(f"Ø{d}: Dt={dt[d]:.2f} % "
-          f"(Det share {100*det[d]/dt[d]:.1f} %)" for d in TIPS))
+          f"(Det share of Dn {100*det[d]/dn[d]:.1f} %)" for d in TIPS))
     print(f"  caption numbers  ·  Ø200 -> Ø330 rise = +{rise:.1f} %")
     # The key sits inside, upper left: the bars rise to the right, so that corner is the only
     # empty one, and the 30 % headroom above the tallest bar is there to hold it.
@@ -98,10 +100,11 @@ def main():
              labelspacing=0.25, borderpad=0.1)
     b.grid(axis="y", which="major", color="#D9D9D9", lw=0.5)
 
-    # (c) the shear dose per tracer at tip entry
+    # (c) the shear rate per tracer in the nozzle
     require(CHECKPOINT, "the solver checkpoint")
-    r_um, gdot = supporting.tracer_entry()
-    # Tracer_entry() returns the entry radius in metres; the axis is labelled µm.
+    entry_stats = {}
+    r_um, gdot = supporting.tracer_entry(entry_stats)
+    # Tracer_entry() returns the radius in metres; the axis is labelled µm.
     r_um = np.asarray(r_um, float)
     if float(np.nanmax(r_um)) < 1e-3:
         r_um = r_um * 1e6
@@ -115,10 +118,10 @@ def main():
              labelspacing=0.25, borderpad=0.1)
     # The median line stays; its value is a caption sentence
     c.set_yscale("log")
-    c.set_xlabel(S.LBL["entry_r"])
-    # The x axis already says "Nozzle entry radius", so the y axis need not repeat "nozzle",
-    # and the shorter label fits the 36 mm panel.
-    c.set_ylabel("Shear rate at entry (s$^{-1}$)")
+    c.set_xlabel(S.LBL["noz_r"])
+    # The x axis already says "in the nozzle", so the y axis need not repeat it, and the
+    # shorter label fits the 36 mm panel.
+    c.set_ylabel("Shear rate (s$^{-1}$)")
     S.panel_label(c, "C")
 
     # Rect leaves the top strip for the panel letters, which sit above the whole panel.
@@ -136,8 +139,16 @@ def main():
     print(f"wrote {OUT.name}  {px[0]}x{px[1]} px = {px[0]/DPI*25.4:.0f} x "
           f"{px[1]/DPI*25.4:.0f} mm at {DPI} dpi")
     print(f"  (a) Ø200 {dt[200]:.2f} % -> Ø330 {dt[330]:.2f} % = {rise:+.1f} %")
-    print(f"  (b) entrance share: " + " · ".join(f"Ø{d} {100*det[d]/dt[d]:.1f} %" for d in TIPS))
+    print(f"  (b) entrance share of Dn: " + " · ".join(f"Ø{d} {100*det[d]/dn[d]:.1f} %" for d in TIPS))
     print(f"  (c) {len(r_um)} tracers, median {med:,.0f} 1/s")
+    # The numbers the caption and the Results print for panel C, from this run
+    import json
+    from l8_paths import DATA
+    entry_stats.update(gdot_min_per_s=float(np.min(gdot)), gdot_max_per_s=float(np.max(gdot)),
+                       gdot_median_per_s=med, r_max_um=float(np.max(r_um)),
+                       r_min_um=float(np.min(r_um)))
+    (DATA / "analyses").mkdir(parents=True, exist_ok=True)
+    (DATA / "analyses" / "fig3c_entry_numbers.json").write_text(json.dumps(entry_stats, indent=1))
     return 0
 
 

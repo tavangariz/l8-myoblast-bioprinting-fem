@@ -20,9 +20,10 @@ import numpy as np
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 import l8_damage as dmg  # noqa: E402
+from l8_geometry import L_NEEDLE, TIP_RADIUS_M  # noqa: E402
 from l8_paths import CANONICAL_GRID, require  # noqa: E402
 
-L, R = 10e-3, 100e-6
+L, R = L_NEEDLE, TIP_RADIUS_M[200]
 P_KPA = np.array([50.0, 100.0, 200.0, 400.0])
 CELLS = {
     # shear law (a1, b1, c1): their Eqs. 16 and 15; K, n: their Section 4.2;

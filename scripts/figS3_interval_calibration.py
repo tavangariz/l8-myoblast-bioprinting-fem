@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Additional file 1, Fig. S3: leave-one-out error against the nominal 95 % interval of the surrogate.
 
-Each of the 32 predictions of total damage is plotted at its nominal 95 % half-width (1.96
-posterior standard deviations) against its actual error; a point below the line lies inside its
-own interval.
+Each of the 32 predictions of the condition-dependent damage Dn, the quantity the surrogate emulates,
+is plotted at its nominal 95 % half-width (1.96 posterior standard deviations) against its actual
+error; a point below the line lies inside its own interval.
 
     python scripts/figS3_interval_calibration.py
 """
@@ -29,7 +29,7 @@ FIGNAME = "FigS3_interval_calibration.png"
 def main():
     rows = SUR.load_grid()
     X = np.array([[r["pressure_kPa"], r["needle_um"]] for r in rows])
-    y = np.array([r["Dt_pct"] for r in rows])
+    y = np.array([r.get("Dn_pct", r["Dt_pct"]) for r in rows])
     dia = np.array([int(r["needle_um"]) for r in rows])
 
     pred, sd = leave_one_out(X, y, gp, with_sd=True)

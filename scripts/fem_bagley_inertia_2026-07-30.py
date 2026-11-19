@@ -13,8 +13,10 @@ Settings of the grid in the article:
 
 L8_INERTIA=0 removes the convective term, L8_LTIP sets the nozzle length (Bagley series),
 L8_MESH_M the number of elements across the nozzle radius, L8_NEEDLES and L8_PRESSURES select
-the cases, and L8_VIZ_CKPT saves the solved field at L8_VIZ_P_KPA as a checkpoint. Run it in the
-Docker image (see the README).
+the cases, and L8_VIZ_CKPT saves the solved field at L8_VIZ_P_KPA as a checkpoint. L8_K_VIS and
+L8_N_EXP replace the consistency and flow-behavior index of the suspension, as for the RSC96
+Schwann-cell suspension of Ning et al. (2018), K = 20.81 and n = 0.37 (results/fem/runs/2026-10-31_rsc96);
+unset, the L8 values are used. Run it in the Docker image (see the README).
 """
 
 # ─── SWITCH ──────────────────────────────────────────────────────────────────
@@ -80,6 +82,9 @@ plt.rcParams.update({
 #  PHYSICAL & DAMAGE PARAMETERS  (Ning et al. 2018)
 # ══════════════════════════════════════════════════════════════════════════════
 K_vis, n_exp, rho = 25.60, 0.35, 990.0
+# The suspension rheology may be overridden from the environment, as for the RSC96 Schwann-cell
+# suspension of Ning et al. (K = 20.81, n = 0.37); unset, the L8 values above are used unchanged.
+K_vis = float(os.environ.get("L8_K_VIS", K_vis)); n_exp = float(os.environ.get("L8_N_EXP", n_exp))
 a1, b1, c1        = 3.20e-4, 0.61, 0.52  # Ning et al. (2018), L8 myoblasts
 a2, b2            = 1.43e-3, 0.55
 
@@ -95,10 +100,13 @@ VIZ_P_KPA = float(os.environ.get("L8_VIZ_P_KPA", "200"))
 # against each length is that section's true friction gradient, and the intercept
 # isolates the localized contraction losses without reference to any external value.
 # Defaults are Ning's published cartridge.
-Lc1 = float(os.environ.get("L8_LC1", "12e-3"))
-Lc2 = float(os.environ.get("L8_LC2", "10.5e-3"))
-Ltip = float(os.environ.get("L8_LTIP", "10e-3"))
-Rin, Rmid      = 2.1e-3, 1.0e-3
+# Defaults come from l8_geometry.GEOM, the one definition the figures also draw from:
+# z2 is Ning's L_c1 and z1 his L_c2.
+from l8_geometry import GEOM, L_NEEDLE, TIP_RADIUS_M
+Lc1 = float(os.environ.get("L8_LC1", repr(GEOM["z2"])))
+Lc2 = float(os.environ.get("L8_LC2", repr(GEOM["z1"])))
+Ltip = float(os.environ.get("L8_LTIP", repr(L_NEEDLE)))
+Rin, Rmid      = GEOM["Rin"], GEOM["Rmid"]
 
 # ── GEOMETRY MODE ────────────────────────────────────────────────────────────
 # The domain is the cartridge-and-needle assembly of Ning et al. 2018, Fig. 1.
@@ -135,7 +143,7 @@ L_CONE     = Lc1 - Lc2           # modelled linear cone Rin -> Rmid (1.5 mm); se
 if GEOM == "ning" and L_CONE <= 0:
     raise SystemExit(f"ning geometry needs Lc1 > Lc2; got Lc1={Lc1}, Lc2={Lc2}")
 
-NEEDLES    = {"100": 50e-6, "200": 100e-6, "250": 125e-6, "330": 165e-6}
+NEEDLES    = {str(d): r for d, r in TIP_RADIUS_M.items()}
 PRESSURES  = [25, 50, 75, 100, 150, 200, 300, 400]
 
 # ─────────────────────────────────────────────────────────────────────────────

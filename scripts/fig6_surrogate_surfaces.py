@@ -1,8 +1,9 @@
 """Fig. 6: Gaussian process response surfaces over applied pressure and nozzle diameter.
 
-(A) log10 Q. (B) log10 wall shear stress. (C) Total damage, with iso-flow contours at 1, 10 and
-100 µL/s. (D) Posterior standard deviation of the total damage. The surrogate is the one in
-l8_surrogate.py; markers are the 32 training cases.
+(A) log10 Q. (B) log10 wall shear stress. (C) Total damage Dt = D0 + (1 - D0) Dn (Eq. 25), with
+iso-flow contours at 1, 10 and 100 µL/s. (D) Conditional posterior standard deviation of the total
+damage, (1 - D0) times that of Dn. The surrogate is the one in l8_surrogate.py, which emulates Dn;
+markers are the 32 training cases.
 
     python scripts/fig6_surrogate_surfaces.py
 """
@@ -119,7 +120,9 @@ def main():
 
     logq = gp_logq.predict(Xz).reshape(P.shape)
     dt, sd = gp_dt.predict(Xz, return_std=True)
-    dt, sd = dt.reshape(P.shape), sd.reshape(P.shape)
+    # The surrogate emulates Dn; panel (c) shows the total Dt = D0 + (1 - D0) Dn (Eq. 25), and
+    # panel (d) the posterior s.d. of that total, (1 - D0) times the s.d. of Dn.
+    dt, sd = SUR.total_from_dn(dt).reshape(P.shape), ((1 - SUR.D0) * sd).reshape(P.shape)
     logtau = gp_tau.predict(Xz).reshape(P.shape)
 
     print(f"  D_t over the trained rectangle: {dt.min():.2f} to {dt.max():.2f} %")
@@ -155,10 +158,10 @@ def main():
         mark_cases(ax[1, 0], rows)
 
         surface(ax[1, 1], P, D, sd, S.CMAP_SD, "D",
-                "Posterior s.d. of  $D_t$ (pp)")
+                "Conditional s.d.  $σ(D_t)$ (pp)")
         mark_cases(ax[1, 1], rows)
 
-        # The four solved diameters as ticks.
+        # The four SOLVED diameters as ticks.
         for _r in range(2):
             for _c in range(2):
                 _ax = ax[_r, _c]

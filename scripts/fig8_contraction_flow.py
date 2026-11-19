@@ -179,7 +179,8 @@ def main():
     pk = float(eps_dot[i_pk])
     half = np.where(eps_dot >= 0.5 * pk)[0]
     width_mm = float((zg[half[-1]] - zg[half[0]]) * 1e3) if len(half) > 1 else float("nan")
-    u_in = float(np.nanmean(uz_axis[zg < z2 - 1.0e-3]))
+    INLET_WINDOW_M = 1e-3   # average the axis over the bore ending 1 mm before the funnel exit
+    u_in = float(np.nanmean(uz_axis[zg < z2 - INLET_WINDOW_M]))
     u_out = float(np.nanmax(uz_axis))
     print(f"  centerline u_z: {u_in:.4f} -> {u_out:.4f} m/s  (x{u_out / u_in:.1f})")
     print(f"  peak du_z/dz  : {pk:.1f} s^-1 at z = {zg[i_pk] * 1e3:.3f} mm "

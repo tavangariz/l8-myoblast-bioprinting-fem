@@ -1,0 +1,682 @@
+{
+ "tau_e_at_1.0": {
+  "100.0": 1276.7,
+  "200.0": 639.4,
+  "250.0": 519.1,
+  "330.0": 396.3
+ },
+ "tau_e_at_17.94": {
+  "200.0": 1901.7,
+  "250.0": 1478.9,
+  "330.0": 1119.3
+ },
+ "bound_330_at_1uLs_Dt_pct": 9.221,
+ "boundary_tau_e": {
+  "200.0": {
+   "P_kPa": 343.9,
+   "tau_e_Pa": 6316.0
+  },
+  "250.0": {
+   "P_kPa": 263.0,
+   "tau_e_Pa": 6234.0
+  },
+  "290.0": {
+   "P_kPa": 217.3,
+   "tau_e_Pa": 6004.0
+  },
+  "330.0": {
+   "P_kPa": 186.3,
+   "tau_e_Pa": 6156.0
+  }
+ },
+ "boundary_by_surrogate_setting": {
+  "Matern 5/2, 1e-6": {
+   "200.0": 343.9,
+   "250.0": 263.0,
+   "290.0": 217.3,
+   "330.0": 186.3
+  },
+  "Matern 5/2, 1e-4": {
+   "200.0": 344.2,
+   "250.0": 262.7,
+   "290.0": 217.0,
+   "330.0": 186.4
+  },
+  "Matern 5/2, 1e-2": {
+   "200.0": 336.6,
+   "250.0": 256.2,
+   "290.0": 213.6,
+   "330.0": 183.8
+  },
+  "Matern 3/2, 1e-6": {
+   "200.0": 344.4,
+   "250.0": 262.3,
+   "290.0": 215.8,
+   "330.0": 186.2
+  },
+  "Matern 3/2, 1e-4": {
+   "200.0": 344.3,
+   "250.0": 262.2,
+   "290.0": 215.8,
+   "330.0": 186.2
+  },
+  "Matern 3/2, 1e-2": {
+   "200.0": 339.3,
+   "250.0": 258.0,
+   "290.0": 214.5,
+   "330.0": 184.3
+  }
+ },
+ "boundary_max_shift_kPa": 7.3,
+ "grid_margin_to_limit_pp": [
+  [
+   330.0,
+   200.0,
+   1.81
+  ],
+  [
+   200.0,
+   300.0,
+   -2.87
+  ],
+  [
+   250.0,
+   300.0,
+   3.77
+  ],
+  [
+   330.0,
+   150.0,
+   -4.05
+  ]
+ ],
+ "Dt_at_measured_op_pressure_200um": 10.13,
+ "Dt_at_model_op_pressure_200um": 9.92,
+ "friction_1pct_boundary_kPa": {
+  "200.0": {
+   "base": 342.2,
+   "minus1": 312.8,
+   "plus1": 370.8
+  },
+  "250.0": {
+   "base": 263.5,
+   "minus1": 244.8,
+   "plus1": 279.8
+  },
+  "330.0": {
+   "base": 187.5,
+   "minus1": 178.8,
+   "plus1": 195.2
+  }
+ },
+ "friction_1pct_matched_flow_Dt_pct": {
+  "1.0": {
+   "100.0": {
+    "P_kPa": 298.37,
+    "minus1": 15.2,
+    "minus1_tau_e_Pa": 2774.0,
+    "base": 11.83,
+    "base_tau_e_Pa": 1276.0,
+    "plus1": 5.15,
+    "plus1_tau_e_Pa": 0.0
+   },
+   "200.0": {
+    "P_kPa": 72.7,
+    "minus1": 11.17,
+    "minus1_tau_e_Pa": 1001.0,
+    "base": 9.92,
+    "base_tau_e_Pa": 639.0,
+    "plus1": 8.24,
+    "plus1_tau_e_Pa": 277.0
+   },
+   "250.0": {
+    "P_kPa": 46.24,
+    "minus1": 10.38,
+    "minus1_tau_e_Pa": 746.0,
+    "base": 9.48,
+    "base_tau_e_Pa": 517.0,
+    "plus1": 8.36,
+    "plus1_tau_e_Pa": 288.0
+   },
+   "330.0": {
+    "P_kPa": 26.38,
+    "minus1": 9.62,
+    "minus1_tau_e_Pa": 530.0,
+    "base": 9.03,
+    "base_tau_e_Pa": 400.0,
+    "plus1": 8.34,
+    "plus1_tau_e_Pa": 271.0
+   },
+   "ordering_holds": {
+    "minus1": true,
+    "base": true,
+    "plus1": false
+   }
+  },
+  "17.94": {
+   "200.0": {
+    "P_kPa": 200.0,
+    "minus1": 15.22,
+    "minus1_tau_e_Pa": 2895.0,
+    "base": 13.19,
+    "base_tau_e_Pa": 1902.0,
+    "plus1": 10.51,
+    "plus1_tau_e_Pa": 908.0
+   },
+   "250.0": {
+    "P_kPa": 127.1,
+    "minus1": 13.65,
+    "minus1_tau_e_Pa": 2096.0,
+    "base": 12.16,
+    "base_tau_e_Pa": 1467.0,
+    "plus1": 10.3,
+    "plus1_tau_e_Pa": 838.0
+   },
+   "330.0": {
+    "P_kPa": 72.51,
+    "minus1": 12.21,
+    "minus1_tau_e_Pa": 1474.0,
+    "base": 11.22,
+    "base_tau_e_Pa": 1118.0,
+    "plus1": 10.07,
+    "plus1_tau_e_Pa": 762.0
+   },
+   "ordering_holds": {
+    "minus1": true,
+    "base": true,
+    "plus1": true
+   }
+  }
+ },
+ "friction_1pct_fixed_200kPa_Dt_pct": {
+  "100.0": {
+   "Q_uLs": 0.319,
+   "minus1": 13.48,
+   "minus1_tau_e_Pa": 1851.0,
+   "base": 10.72,
+   "base_tau_e_Pa": 847.0,
+   "plus1": 5.35,
+   "plus1_tau_e_Pa": 0.0
+  },
+  "200.0": {
+   "Q_uLs": 17.94,
+   "minus1": 15.22,
+   "minus1_tau_e_Pa": 2895.0,
+   "base": 13.19,
+   "base_tau_e_Pa": 1902.0,
+   "plus1": 10.51,
+   "plus1_tau_e_Pa": 908.0
+  },
+  "250.0": {
+   "Q_uLs": 64.273,
+   "minus1": 16.96,
+   "minus1_tau_e_Pa": 3952.0,
+   "base": 15.29,
+   "base_tau_e_Pa": 2969.0,
+   "plus1": 13.32,
+   "plus1_tau_e_Pa": 1987.0
+  },
+  "330.0": {
+   "Q_uLs": 283.418,
+   "minus1": 22.8,
+   "minus1_tau_e_Pa": 8681.0,
+   "base": 21.81,
+   "base_tau_e_Pa": 7746.0,
+   "plus1": 20.75,
+   "plus1_tau_e_Pa": 6811.0
+  },
+  "ordering_holds": {
+   "minus1": true,
+   "base": true,
+   "plus1": true
+  }
+ },
+ "friction_1pct_grid": {
+  "per_nozzle": {
+   "100.0": {
+    "pen_over_friction_pct_min": 0.79,
+    "pen_over_friction_pct_max": 0.88,
+    "shear_dominated_kPa": {
+     "minus1": [
+      25.0
+     ],
+     "base": [
+      25.0
+     ],
+     "plus1": [
+      25.0,
+      50.0,
+      75.0,
+      100.0,
+      150.0,
+      200.0,
+      300.0,
+      400.0
+     ]
+    },
+    "plus1_Dt_monotonic_decreasing": true
+   },
+   "200.0": {
+    "pen_over_friction_pct_min": 1.69,
+    "pen_over_friction_pct_max": 5.26,
+    "shear_dominated_kPa": {
+     "minus1": [],
+     "base": [],
+     "plus1": [
+      25.0
+     ]
+    },
+    "plus1_Dt_monotonic_decreasing": false
+   },
+   "250.0": {
+    "pen_over_friction_pct_min": 2.26,
+    "pen_over_friction_pct_max": 14.83,
+    "shear_dominated_kPa": {
+     "minus1": [],
+     "base": [],
+     "plus1": []
+    },
+    "plus1_Dt_monotonic_decreasing": false
+   },
+   "330.0": {
+    "pen_over_friction_pct_min": 3.09,
+    "pen_over_friction_pct_max": 41.83,
+    "shear_dominated_kPa": {
+     "minus1": [],
+     "base": [],
+     "plus1": []
+    },
+    "plus1_Dt_monotonic_decreasing": false
+   }
+  },
+  "cases": [
+   {
+    "D_um": 100.0,
+    "P_kPa": 25.0,
+    "pen_over_friction_pct": 0.81,
+    "minus1": 11.36,
+    "minus1_dominant": "shear",
+    "base": 10.42,
+    "base_dominant": "shear",
+    "plus1": 8.75,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 50.0,
+    "pen_over_friction_pct": 0.79,
+    "minus1": 10.73,
+    "minus1_dominant": "entrance",
+    "base": 9.37,
+    "base_dominant": "entrance",
+    "plus1": 6.94,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 75.0,
+    "pen_over_friction_pct": 0.81,
+    "minus1": 11.02,
+    "minus1_dominant": "entrance",
+    "base": 9.35,
+    "base_dominant": "entrance",
+    "plus1": 6.28,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 100.0,
+    "pen_over_friction_pct": 0.82,
+    "minus1": 11.5,
+    "minus1_dominant": "entrance",
+    "base": 9.56,
+    "base_dominant": "entrance",
+    "plus1": 5.92,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 150.0,
+    "pen_over_friction_pct": 0.84,
+    "minus1": 12.52,
+    "minus1_dominant": "entrance",
+    "base": 10.14,
+    "base_dominant": "entrance",
+    "plus1": 5.55,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 200.0,
+    "pen_over_friction_pct": 0.84,
+    "minus1": 13.48,
+    "minus1_dominant": "entrance",
+    "base": 10.72,
+    "base_dominant": "entrance",
+    "plus1": 5.35,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 300.0,
+    "pen_over_friction_pct": 0.85,
+    "minus1": 15.23,
+    "minus1_dominant": "entrance",
+    "base": 11.85,
+    "base_dominant": "entrance",
+    "plus1": 5.14,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 100.0,
+    "P_kPa": 400.0,
+    "pen_over_friction_pct": 0.88,
+    "minus1": 16.83,
+    "minus1_dominant": "entrance",
+    "base": 12.98,
+    "base_dominant": "entrance",
+    "plus1": 5.04,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 25.0,
+    "pen_over_friction_pct": 1.69,
+    "minus1": 9.53,
+    "minus1_dominant": "entrance",
+    "base": 8.8,
+    "base_dominant": "entrance",
+    "plus1": 7.82,
+    "plus1_dominant": "shear"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 50.0,
+    "pen_over_friction_pct": 1.77,
+    "minus1": 10.35,
+    "minus1_dominant": "entrance",
+    "base": 9.32,
+    "base_dominant": "entrance",
+    "plus1": 7.94,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 75.0,
+    "pen_over_friction_pct": 1.77,
+    "minus1": 11.26,
+    "minus1_dominant": "entrance",
+    "base": 9.98,
+    "base_dominant": "entrance",
+    "plus1": 8.28,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 100.0,
+    "pen_over_friction_pct": 1.77,
+    "minus1": 12.11,
+    "minus1_dominant": "entrance",
+    "base": 10.64,
+    "base_dominant": "entrance",
+    "plus1": 8.66,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 150.0,
+    "pen_over_friction_pct": 1.81,
+    "minus1": 13.69,
+    "minus1_dominant": "entrance",
+    "base": 11.89,
+    "base_dominant": "entrance",
+    "plus1": 9.47,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 200.0,
+    "pen_over_friction_pct": 1.91,
+    "minus1": 15.22,
+    "minus1_dominant": "entrance",
+    "base": 13.19,
+    "base_dominant": "entrance",
+    "plus1": 10.51,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 300.0,
+    "pen_over_friction_pct": 2.75,
+    "minus1": 19.23,
+    "minus1_dominant": "entrance",
+    "base": 17.13,
+    "base_dominant": "entrance",
+    "plus1": 14.57,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 200.0,
+    "P_kPa": 400.0,
+    "pen_over_friction_pct": 5.26,
+    "minus1": 25.94,
+    "minus1_dominant": "entrance",
+    "base": 24.23,
+    "base_dominant": "entrance",
+    "plus1": 22.31,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 25.0,
+    "pen_over_friction_pct": 2.26,
+    "minus1": 9.46,
+    "minus1_dominant": "entrance",
+    "base": 8.8,
+    "base_dominant": "entrance",
+    "plus1": 7.99,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 50.0,
+    "pen_over_friction_pct": 2.26,
+    "minus1": 10.55,
+    "minus1_dominant": "entrance",
+    "base": 9.61,
+    "base_dominant": "entrance",
+    "plus1": 8.45,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 75.0,
+    "pen_over_friction_pct": 2.27,
+    "minus1": 11.63,
+    "minus1_dominant": "entrance",
+    "base": 10.48,
+    "base_dominant": "entrance",
+    "plus1": 9.04,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 100.0,
+    "pen_over_friction_pct": 2.29,
+    "minus1": 12.63,
+    "minus1_dominant": "entrance",
+    "base": 11.3,
+    "base_dominant": "entrance",
+    "plus1": 9.64,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 150.0,
+    "pen_over_friction_pct": 2.46,
+    "minus1": 14.57,
+    "minus1_dominant": "entrance",
+    "base": 12.99,
+    "base_dominant": "entrance",
+    "plus1": 11.04,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 200.0,
+    "pen_over_friction_pct": 3.02,
+    "minus1": 16.96,
+    "minus1_dominant": "entrance",
+    "base": 15.29,
+    "base_dominant": "entrance",
+    "plus1": 13.32,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 300.0,
+    "pen_over_friction_pct": 6.78,
+    "minus1": 25.09,
+    "minus1_dominant": "entrance",
+    "base": 23.77,
+    "base_dominant": "entrance",
+    "plus1": 22.33,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 250.0,
+    "P_kPa": 400.0,
+    "pen_over_friction_pct": 14.83,
+    "minus1": 36.08,
+    "minus1_dominant": "entrance",
+    "base": 35.18,
+    "base_dominant": "entrance",
+    "plus1": 34.23,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 25.0,
+    "pen_over_friction_pct": 3.09,
+    "minus1": 9.54,
+    "minus1_dominant": "entrance",
+    "base": 8.97,
+    "base_dominant": "entrance",
+    "plus1": 8.3,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 50.0,
+    "pen_over_friction_pct": 3.1,
+    "minus1": 11.01,
+    "minus1_dominant": "entrance",
+    "base": 10.19,
+    "base_dominant": "entrance",
+    "plus1": 9.23,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 75.0,
+    "pen_over_friction_pct": 3.15,
+    "minus1": 12.34,
+    "minus1_dominant": "entrance",
+    "base": 11.34,
+    "base_dominant": "entrance",
+    "plus1": 10.17,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 100.0,
+    "pen_over_friction_pct": 3.32,
+    "minus1": 13.65,
+    "minus1_dominant": "entrance",
+    "base": 12.52,
+    "base_dominant": "entrance",
+    "plus1": 11.2,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 150.0,
+    "pen_over_friction_pct": 4.62,
+    "minus1": 17.14,
+    "minus1_dominant": "entrance",
+    "base": 15.95,
+    "base_dominant": "entrance",
+    "plus1": 14.63,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 200.0,
+    "pen_over_friction_pct": 8.28,
+    "minus1": 22.8,
+    "minus1_dominant": "entrance",
+    "base": 21.81,
+    "base_dominant": "entrance",
+    "plus1": 20.75,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 300.0,
+    "pen_over_friction_pct": 22.73,
+    "minus1": 36.79,
+    "minus1_dominant": "entrance",
+    "base": 36.18,
+    "base_dominant": "entrance",
+    "plus1": 35.55,
+    "plus1_dominant": "entrance"
+   },
+   {
+    "D_um": 330.0,
+    "P_kPa": 400.0,
+    "pen_over_friction_pct": 41.83,
+    "minus1": 48.43,
+    "minus1_dominant": "entrance",
+    "base": 48.02,
+    "base_dominant": "entrance",
+    "plus1": 47.6,
+    "plus1_dominant": "entrance"
+   }
+  ]
+ },
+ "friction_ordering_lost_at": {
+  "matched_1uLs_all_four": {
+   "plus_pct": 0.54,
+   "plus_pair_um": [
+    100.0,
+    200.0
+   ],
+   "minus_pct": null
+  },
+  "matched_1uLs_200_250_330": {
+   "plus_pct": 0.84,
+   "plus_pair_um": [
+    200.0,
+    250.0
+   ],
+   "minus_pct": null
+  },
+  "matched_17_94uLs_200_250_330": {
+   "plus_pct": 1.18,
+   "plus_pair_um": [
+    200.0,
+    250.0
+   ],
+   "minus_pct": null
+  },
+  "fixed_200kPa_all_four": {
+   "plus_pct": 1.91,
+   "plus_pair_um": [
+    100.0,
+    200.0
+   ],
+   "minus_pct": null
+  }
+ },
+ "friction_ordering_scan_max_pct": 10.0
+}

@@ -3,10 +3,11 @@
 
 Held-out tests, with the input standardization and hyperparameters refitted inside every fold:
 one case, a whole nozzle diameter or a whole applied pressure left out. For each output: mean
-absolute, root-mean-square and largest error, the operating-window decisions, and the coverage of
-the nominal 95 % interval. Also the same splits for linear, quadratic and cubic polynomial
-surfaces, a sensitivity study over kernel smoothness and alpha, a learning curve, and fit and
-query timings. Writes surrogate_validation.json, fold_predictions.csv, blocked_holdouts.csv and
+absolute, root-mean-square and largest error (for damage, on the condition-dependent damage Dn the
+surrogate emulates), the operating-window decisions (on the total damage Dt = D0 + (1 - D0) Dn), and
+the coverage of the nominal 95 % interval. Also the same splits for linear, quadratic and cubic
+polynomial surfaces, a sensitivity study over kernel smoothness and alpha, a learning curve, and fit
+and query timings. Writes surrogate_validation.json, fold_predictions.csv, blocked_holdouts.csv and
 sensitivity.csv to results/surrogate/.
 
     python scripts/surrogate_validation.py
@@ -40,7 +41,7 @@ SENS_ALPHAS = (1e-6, 1e-4, 1e-2)
 def load():
     rows = S.load_grid()
     X = np.array([[r["pressure_kPa"], r["needle_um"]] for r in rows], float)
-    y = {"D_t": np.array([r["Dt_pct"] for r in rows]),
+    y = {"D_t": np.array([r.get("Dn_pct", r["Dt_pct"]) for r in rows]),   # errors on Dn
          "log10_Q": np.log10([r["Q_uLs"] for r in rows]),
          "log10_tau_w": np.log10([r["tau_w_Pa"] for r in rows])}
     return rows, X, y
@@ -90,8 +91,9 @@ def coverage(y, pred, std):
 
 
 def decisions(dt_true, q_true, dt_pred, q_pred):
-    ok_true = (dt_true < S.DT_MAX) & (q_true >= S.Q_MIN)
-    ok_pred = (dt_pred < S.DT_MAX) & (q_pred >= S.Q_MIN)
+    # The window is decided on the total, Dt = D0 + (1 - D0) Dn (Eq. 25); errors stay on Dn
+    ok_true = (S.total_from_dn(dt_true) < S.DT_MAX) & (q_true >= S.Q_MIN)
+    ok_pred = (S.total_from_dn(dt_pred) < S.DT_MAX) & (q_pred >= S.Q_MIN)
     return {"accepted_by_fem": int(ok_true.sum()), "accepted_by_surrogate": int(ok_pred.sum()),
             "wrongly_accepted": int((ok_pred & ~ok_true).sum()),
             "wrongly_rejected": int((~ok_pred & ok_true).sum())}
@@ -210,6 +212,7 @@ def main():
             block["baselines_D_t_pp"][nm] = scores(y["D_t"], bp)
         R["holdout"][scheme] = block
         for i in range(len(y["D_t"])):
+            # The Dt_* column names are kept for the readers of this file; the values are Dn (y["D_t"] above)
             fold_rows.append({"holdout": scheme, "group": group[i], "kind": kind[i],
                               "needle_um": X[i, 1], "pressure_kPa": X[i, 0],
                               "Dt_fem_pct": y["D_t"][i], "Dt_pred_pct": dt_p[i],

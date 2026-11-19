@@ -3,8 +3,8 @@
 
 Both solutions are reduced through l8_damage.derive. For every case the script prints the inertial
 share of the entrance pressure, the fraction of p_en removed without the convective term
-(Additional file 1, Table S1), and inertia's share of the predicted total damage. It then prints
-the rise in damage from the 200 to the 330 µm nozzle at 200 kPa with and without inertia, and
+(Additional file 1, Table S1), and inertia's share of the condition-dependent damage Dn. It then
+prints the rise in Dn from the 200 to the 330 µm nozzle at 200 kPa with and without inertia, and
 compares the inertial part of p_en with the kinetic energy the jet carries out of the nozzle,
 alpha * rho * u_mean**2 / 2, with alpha = 3(3n+1)**2 / ((2n+1)(5n+3)) for developed power-law flow.
 
@@ -35,13 +35,13 @@ def main() -> int:
     n = D.N_EXP
     alpha = 3 * (3 * n + 1) ** 2 / ((2 * n + 1) * (5 * n + 3))
     print(f"{'D':>4} {'dP':>4} {'p_en':>8} {'p_en, no inertia':>17} {'inertial share':>15} {'Dt':>7} "
-          f"{'Dt, no inertia':>15} {'share of Dt':>12}")
+          f"{'Dt, no inertia':>15} {'share of Dn':>12}")
     rows = {}
     for (d, p) in sorted(ns):
         R = d / 2 * 1e-6
         a, b = D.derive(p, ns[(d, p)], R), D.derive(p, st[(d, p)], R)
         pen_share = 100 * (a["P_en_kPa"] - b["P_en_kPa"]) / a["P_en_kPa"]
-        dt_share = 100 * (a["Dt_pct"] - b["Dt_pct"]) / a["Dt_pct"]
+        dt_share = 100 * (a["Dn_pct"] - b["Dn_pct"]) / a["Dn_pct"]   # share of the condition-dependent damage
         u = ns[(d, p)] * 1e-9 / (math.pi * R ** 2)
         ke = alpha * D.RHO * u ** 2 / 2 / 1e3
         rows[(d, p)] = (a, b, pen_share, dt_share, a["P_en_kPa"] - b["P_en_kPa"], ke)
@@ -50,12 +50,12 @@ def main() -> int:
     print(f"\ninertial share of p_en above 50 %: {sum(v[2] > 50 for v in rows.values())} of {len(rows)} cases; "
           f"200 µm nozzle at 50-400 kPa: {min(rows[(200, p)][2] for p in (50.0, 100.0, 200.0, 400.0)):.1f} to "
           f"{max(rows[(200, p)][2] for p in (50.0, 100.0, 200.0, 400.0)):.1f} %")
-    print("inertia's share of Dt at 200 kPa: " + ", ".join(
+    print("inertia's share of Dn at 200 kPa: " + ", ".join(
         f"{d} µm {rows[(d, 200.0)][3]:.1f} %" for d in (100, 200, 250, 330))
           + f"; largest at 330 µm: {max(rows[(330, p)][3] for p in (25.0, 50.0, 75.0, 100.0, 150.0, 200.0, 300.0, 400.0)):.1f} %")
     for k, label in ((0, "with inertia"), (1, "without inertia")):
-        lo, hi = rows[(200, 200.0)][k]["Dt_pct"], rows[(330, 200.0)][k]["Dt_pct"]
-        print(f"200 -> 330 µm at 200 kPa, {label}: Dt {lo:.2f} -> {hi:.2f} %, {100 * (hi - lo) / lo:+.1f} %")
+        lo, hi = rows[(200, 200.0)][k]["Dn_pct"], rows[(330, 200.0)][k]["Dn_pct"]
+        print(f"200 -> 330 µm at 200 kPa, {label}: Dn {lo:.2f} -> {hi:.2f} %, {100 * (hi - lo) / lo:+.1f} %, {hi - lo:+.2f} pp")
     big = [v for v in rows.values() if v[4] > 0.1]
     print(f"inertial part of p_en against alpha*rho*u^2/2 (alpha = {alpha:.2f}): {len(big)} cases with an "
           f"inertial part above 0.1 kPa, agreement within {max(abs(v[4] / v[5] - 1) for v in big) * 100:.1f} %")

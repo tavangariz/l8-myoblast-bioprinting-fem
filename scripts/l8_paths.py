@@ -29,7 +29,9 @@ FIGMIRROR = pathlib.Path(os.environ["L8_FIGDIR"]) if os.environ.get("L8_FIGDIR")
 #: The canonical 4 x 8 grid: four tip diameters, eight applied pressures, mesh M12,
 #: solved on the cartridge-and-needle domain of Ning et al. (2018). The name carries the
 #: date the grid was solved, so a figure always states which solution it was drawn from.
-CANONICAL_GRID = DATA / "fem" / "exports" / "L8_FEM_canonical_2026-08-27.csv"
+CANONICAL_GRID = DATA / "fem" / "exports" / "L8_FEM_canonical_2026-10-31.csv"
+# The grid before D0 entered the damage chain (release 1.0.0), kept for comparison.
+CANONICAL_GRID_V1 = DATA / "fem" / "exports" / "L8_FEM_canonical_2026-08-27.csv"
 
 
 #: The converged FEM field the trajectory and contraction figures interpolate. It is a large

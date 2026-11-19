@@ -56,7 +56,7 @@ def panel(ax, rows, mean_key, max_key, letter, xlabel, ylabel):
 
 def main():
     g = load()
-    dt_lbl = "Held-out error  $|\\Delta D_t|$  (pp)"
+    dt_lbl = "Held-out error  $|\\Delta D_n|$  (pp)"
     q_lbl = "Held-out error  $|\\Delta \\log_{10} Q|$"
     with plt.rc_context(S.rc(S.PAPER)):
         # 170 mm on the page after the tight crop, as every manuscript figure.

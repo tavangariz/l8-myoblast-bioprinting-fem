@@ -1,11 +1,24 @@
 #!/usr/bin/env python3
 """Fig. 5: Lagrangian trajectories through the cartridge and nozzle.
 
-168 tracers, seeded uniformly by area, are integrated through the solved velocity field at the
-reference condition (200 kPa, 200 µm). Each takes the shear damage of the radius at which it
-enters the nozzle; the extensional damage is the same for every tracer. Before drawing, the script
-checks that the damage law reproduces two values published by Ning et al. (2018) and that the area
-average over the nozzle matches the grid.
+Tracers are released over the inner 95 % of the cartridge radius on a plane 5 mm into the cartridge
+and integrated through the solved velocity field at the reference condition (200 kPa, 200 µm). Each
+takes the shear damage Ds of Eq. 20 at the radius at which it travels through the nozzle, the median
+radius of its path beyond the first 1 mm, where the paths have stopped converging; the entrance damage
+is the same for every tracer.
+
+(A) The 168 tracks from the release plane to the outlet and (B) inside the nozzle, coloured by the
+condition-dependent damage Dn. (C) Ds, on a logarithmic axis, against the radius in the nozzle.
+(D) Distribution of Dn over the tracers, with the entrance-associated damage common to every tracer
+dashed. How the tracer statistics depend on the tracer set is tracking_sensitivity.py (Additional
+file 2, Table S11).
+
+Before drawing, the script checks that the damage law reproduces two values published by Ning et al.
+(2018), that the profile reproduces the Dn of the grid and that the tracks it draws reproduce the
+per-tracer table of tracking_sensitivity.py. The tracks are read from
+results/analyses/tracking_published_paths_cache.npz, which holds the paths of that table; without it they are
+integrated again and must match the table to 0.5 µm in radius and 0.01 percentage points in Ds. The numbers
+of the caption go to results/analyses/fig5_caption_numbers.json.
 
     python scripts/fig5_lagrangian_tracers.py
 """
@@ -39,6 +52,8 @@ D_T_CANONICAL = 8.956349848105468    # per cent, what this must reproduce
 N_TRACERS = 168        # the manuscript's tracer count
 RNG_SEED = 20260804    # same seed as the visualisation pipeline
 Z_SEED = 5e-3          # release plane, 5 mm into the barrel
+# ODE tolerances of every tracer path.
+RTOL, ATOL = 1e-8, 1e-13
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 CKPT = os.environ.get(
@@ -65,6 +80,33 @@ def radius_at_z(z, geom):
     the funnel, which is the outer, highest-shear part of the ensemble.
     """
     return wall_radius(z, geom)
+
+
+def nozzle_radius(path, g, skip=1e-3):
+    """The radius a tracer travels at through the straight nozzle: the median |r| of its path beyond the first
+    `skip` of the nozzle. At the inlet plane the paths are still converging (the outermost settles about 3 µm
+    inward within 0.1 mm of the 10 mm nozzle), so the radius at entry is not the radius the shear acts at."""
+    m = (path[:, 1] >= g["z2"] + skip) & (path[:, 1] <= g["z3"])
+    return float(min(np.median(np.abs(path[m, 0])), g["Rtip"]))
+
+
+def entry_radius(path, g):
+    """|r| where a tracer crosses the nozzle inlet plane z = z2: a cubic in z through the two stored path points on
+    either side of the plane. The first stored point past the plane lies an arbitrary distance beyond it, set by
+    where the adaptive steps fall, and the radius read there can sit about 1 µm inside the crossing radius."""
+    j = int(np.argmax(path[:, 1] >= g["z2"]))
+    k = slice(max(j - 2, 0), min(j + 2, len(path)))
+    zz, rr = path[k, 1] - g["z2"], path[k, 0]
+    return float(min(abs(np.polyval(np.polyfit(zz, rr, min(3, len(zz) - 1)), 0.0)), g["Rtip"]))
+
+
+def shear_damage_function(g):
+    """D_s(r) of Eq. 20 at the reference condition: the integrand of the area average of Eq. 21, so the tracers and
+    Eq. 21 use one law. Checked against the canonical D_st before use."""
+    from l8_damage import REFERENCE, compute_Dst, derive, shear_damage_at
+    dp = derive(REFERENCE["P_kPa"], REFERENCE["Q_uLs"], g["Rtip"])["dP_tip_kPa"] * 1e3
+    assert abs(compute_Dst(dp, g["Rtip"]) - D_ST_TARGET) < 1e-9, "Eq. 21 does not reproduce the canonical D_st"
+    return lambda r: shear_damage_at(r, dp, g["Rtip"])
 
 
 def check_damage_law():
@@ -167,7 +209,7 @@ def integrate(raw, prof, n_want=N_TRACERS):
         if len(paths) >= n_want:
             break
         sol = solve_ivp(ode, (0.0, 120.0), [float(r_seeds[i]), Z_SEED],
-                        events=outlet, max_step=0.01, rtol=1e-4, atol=1e-9)
+                        events=outlet, max_step=0.01, rtol=RTOL, atol=ATOL)
         path = sol.y[:2].T
         if path.shape[0] <= 5 or path[-1, 1] < g["z3"] * 0.999:
             continue
@@ -176,8 +218,8 @@ def integrate(raw, prof, n_want=N_TRACERS):
         in_tip = path[:, 1] >= g["z2"]
         if not np.any(in_tip):
             continue
-        r_tip = float(np.clip(abs(path[int(np.argmax(in_tip)), 0]), 0.0, g["Rtip"]))
-        ds = float(np.interp(r_tip, prof["r"], prof["D_s"]))
+        r_tip = nozzle_radius(path, g)
+        ds = float(shear_damage_function(g)(r_tip))
         paths.append(path)
         ds_p.append(ds)
         dt_p.append((prof["D_e"] + (1.0 - prof["D_e"]) * ds) * 100.0)
@@ -242,69 +284,188 @@ def clearance_px(a, b):
                max(a.y0, b.y0) - min(a.y1, b.y1))
 
 
+def load_tracks(raw, prof):
+    """The published 168 tracks: from the cache of tracking_sensitivity.py when it was written
+    from this checkpoint, otherwise tracked here. Either way the per-tracer quantities are derived from
+    the paths by the same rule as `integrate`."""
+    import hashlib
+    from l8_paths import DATA
+    g = raw["geom"]
+    cache = DATA / "analyses" / "tracking_published_paths_cache.npz"
+    md5 = hashlib.md5(open(CKPT, "rb").read()).hexdigest()
+    z = np.load(cache) if cache.exists() else None
+    if z is not None and str(z["ckpt_md5"]) == md5 and "rtol" in z.files and float(z["rtol"]) == RTOL \
+            and float(z["atol"]) == ATOL:
+        paths = [z["xy"][a:b] for a, b in zip(z["ptr"][:-1], z["ptr"][1:])]
+        cached = True
+        print(f"  tracks: {len(paths)} read from {cache.name} (checkpoint md5 and tolerances match)")
+    else:
+        paths = integrate(raw, prof)["paths"]
+        cached = False
+        print(f"  tracks: {len(paths)} integrated here")
+    if len(paths) != N_TRACERS:
+        sys.exit(f"{len(paths)} tracks, expected {N_TRACERS}")
+    ds_at = shear_damage_function(g)
+    ds_p, r_tip_p = [], []
+    for path in paths:
+        r_noz = nozzle_radius(path, g)
+        r_tip_p.append(r_noz)
+        ds_p.append(float(ds_at(r_noz)))
+    ds_p = np.asarray(ds_p)
+    return {"paths": paths, "D_s": ds_p, "D_t": (prof["D_e"] + (1.0 - prof["D_e"]) * ds_p) * 100.0,
+            "r_tip": np.asarray(r_tip_p), "cached": cached}
+
+
+SETS = (("published", "{kept} tracers\n$r_0 \\leq 0.95\\,R_\\mathrm{{in}}$"),
+        ("pool_0.95", "{kept} tracers\n$r_0 \\leq 0.95\\,R_\\mathrm{{in}}$"),
+        ("pool_0.99", "{kept} of {seeded}\n$r_0 \\leq 0.99\\,R_\\mathrm{{in}}$"),
+        ("flux_0.99", "{kept} of {seeded}\nflow-weighted\n$r_0 \\leq 0.99\\,R_\\mathrm{{in}}$"))
+
+
+def load_sets():
+    """Per-tracer shear damage of the four sets, and the summary they must reproduce."""
+    import csv
+    import json
+    from l8_paths import DATA
+    rows = list(csv.DictReader(open(DATA / "analyses" / "tracking_tracers.csv")))
+    summ = json.loads((DATA / "analyses" / "tracking_sensitivity.json").read_text())
+    out = {}
+    for (sid, _), s in zip(SETS, summ["sets"]):
+        ds = np.array([float(r["D_s_pct"]) for r in rows if r["set"] == sid])
+        er = np.array([float(r["nozzle_r_um"]) for r in rows if r["set"] == sid])
+        assert len(ds) == s["kept"], (sid, len(ds), s["kept"])
+        assert abs(ds.mean() - s["mean_Dst_pct"]) < 5e-5 and abs(np.percentile(ds, 95) - s["p95_Dst_pct"]) < 5e-5, sid
+        out[sid] = {"D_s": ds, "nozzle_r_um": er, "summary": s}
+    return out, summ
+
+
 def main():
-    print("Figure 3 — Lagrangian trajectories")
+    print("Figure 5 — Lagrangian trajectories")
     check_damage_law()
     raw = load_checkpoint(CKPT)
     g = raw["geom"]
     prof = compute_damage_profile(raw)
     print(f"  profile: D_st = {prof['D_st']*100:.4f} %  D_et = {prof['D_e']*100:.4f} %  "
-          f"D_t = {prof['D_total']*100:.4f} %")
+          f"D_n = {prof['D_total']*100:.4f} %")
     if abs(prof["D_total"] * 100 - D_T_CANONICAL) > 1e-6:
-        sys.exit(f"profile D_t {prof['D_total']*100:.6f} != canonical {D_T_CANONICAL:.6f}")
-    print(f"  reproduces the canonical grid to 1e-6  OK")
+        sys.exit(f"profile D_n {prof['D_total']*100:.6f} != canonical {D_T_CANONICAL:.6f}")
+    print("  reproduces the canonical grid to 1e-6  OK")
 
-    tr = integrate(raw, prof)
+    tr = load_tracks(raw, prof)
+    sets, summ = load_sets()
+    # The cached tracks are the table's tracks: same radius in the nozzle, same D_s, tracer by tracer.
+    pub = sets["published"]
+    tol_r, tol_ds = (1e-5, 1e-6) if tr["cached"] else (0.05, 0.002)
+    dr = np.abs(np.sort(tr["r_tip"] * 1e6) - np.sort(pub["nozzle_r_um"])).max()
+    dds = np.abs(np.sort(tr["D_s"] * 100) - np.sort(pub["D_s"])).max()
+    assert dr <= tol_r, f"tracks differ from the table by {dr:.3g} µm"
+    assert dds <= tol_ds, f"D_s differs from the table by {dds:.3g} pp"
+    print(f"  tracks against the table: radii within {dr:.2g} µm, D_s within {dds:.2g} pp")
     dt, r_tip = tr["D_t"], tr["r_tip"]
-    print(f"  tracked {len(dt)} tracers · D_t {dt.min():.3f} to {dt.max():.3f} %, "
-          f"spread {dt.max()-dt.min():.3f} pp")
+    ds_pct = tr["D_s"] * 100
+    r_star = float(r_tip.max())          # the outermost radius at which the published set travels the nozzle
+    print(f"  tracked {len(dt)} tracers · D_n {dt.min():.3f} to {dt.max():.3f} %, spread {dt.max()-dt.min():.3f} pp")
+
+    # Reference averages, and the share of the flow in the stream the 168 tracers do not sample.
+    from l8_damage import derive, REFERENCE
+    ref = derive(REFERENCE["P_kPa"], REFERENCE["Q_uLs"], g["Rtip"])
+    r0_star = max(abs(float(p[0, 0])) for p in tr["paths"])
+    iz = LinearNDInterpolator(raw["pts2d"], raw["u"][:, 1], fill_value=np.nan)
+    rr = np.linspace(0.0, g["Rin"], 20001)
+    uz = np.nan_to_num(iz(np.column_stack([rr, np.full_like(rr, Z_SEED)])), nan=0.0)
+    flux = np.cumsum(np.r_[0.0, 0.5 * (rr[1:] * uz[1:] + rr[:-1] * uz[:-1]) * np.diff(rr)])
+    q_plane = 2 * np.pi * float(flux[-1]) * 1e9
+    assert abs(q_plane / raw["Q_uLs"] - 1) < 0.02, f"release-plane flow {q_plane:.3f} against {raw['Q_uLs']:.3f} µL/s"
+    layer_flow = 1.0 - float(np.interp(r0_star, rr, flux)) / float(flux[-1])
+    print(f"  release plane: flow {q_plane:.3f} µL/s against {raw['Q_uLs']:.3f} solved; outermost release "
+          f"{r0_star*1e3:.4f} mm = {r0_star/g['Rin']:.4f} R_in; outside it {layer_flow*100:.2f} % of the flow")
+    # The same share from the developed nozzle profile outside the radius the outermost tracer travels at: the two
+    # agree if the tracked stream tube is the developed one, which is what reading D_s at that radius assumes.
+    from l8_damage import velocity_profile
+    ds_fn = shear_damage_function(g)
+    dp = ref["dP_tip_kPa"] * 1e3
+    rn = np.linspace(0.0, g["Rtip"], 200001)
+    vn = velocity_profile(dp, g["Rtip"], rn)
+    fn = np.cumsum(np.r_[0.0, 0.5 * (rn[1:] * vn[1:] + rn[:-1] * vn[:-1]) * np.diff(rn)])
+    layer_flow_noz = 1.0 - float(np.interp(r_star, rn, fn)) / float(fn[-1])
+    # Near the wall the flow outside r grows as (R - r)^2, so the two shares are compared as radii: the nozzle radius
+    # whose annulus carries the release-plane share must lie within the ~1 µm scatter of the tracked radii.
+    r_equiv = float(np.interp(1.0 - layer_flow, fn / fn[-1], rn))
+    assert abs(r_equiv - r_star) < 1e-6, (r_equiv, r_star)
+    print(f"  nozzle: outside {r_star*1e6:.2f} µm the developed profile carries {layer_flow_noz*100:.2f} % of the flow; "
+          f"the release-plane share {layer_flow*100:.2f} % corresponds to {r_equiv*1e6:.2f} µm "
+          f"({(r_star - r_equiv)*1e6:.2f} µm apart)")
+
+    def t_res(r):
+        return (g["z3"] - g["z2"]) / float(velocity_profile(dp, g["Rtip"], r))
+    d_area, d_flow = ref["Dst_pct"], ref["Dst_flux_pct"]
+    assert abs(d_area - prof["D_st"] * 100) < 1e-6, (d_area, prof["D_st"])
+    p99 = sets["pool_0.99"]["D_s"]
+    pfx = sets["flux_0.99"]["D_s"]
+    print(f"  caption: D_s {ds_pct.min():.2f} % for the innermost tracer to {ds_pct.max():.2f} % for the outermost "
+          f"(radius in the nozzle {r_star*1e6:.2f} um = {r_star/g['Rtip']*100:.1f} % of R, {(g['Rtip']-r_star)*1e6:.2f} um from the wall); "
+          f"D_et = {prof['D_e']*100:.2f} %")
+    print(f"  caption: area average {d_area:.3f} %, flow-weighted average {d_flow:.3f} %")
+    print(f"  caption: tracers above {ds_pct.max():.3f} % shear damage: {np.mean(p99 > ds_pct.max())*100:.1f} % of the "
+          f"0.99 set, {np.mean(pfx > ds_pct.max())*100:.1f} % of the flow-weighted set")
+    for sid, lab in SETS:
+        s = sets[sid]["summary"]
+        print(f"  set {sid:10s} kept {s['kept']:4d} of {s['seeded']:4d}: mean {s['mean_Dst_pct']:.3f} %, "
+              f"p95 {s['p95_Dst_pct']:.3f} %, max {s['max_Dst_pct']:.3f} %")
+
+    # The caption's numbers, written to results/analyses/fig5_caption_numbers.json.
+    import json
+    from l8_paths import DATA
+    cap = dict(n_tracers=len(dt), Ds_min_pct=round(float(ds_pct.min()), 4), Ds_max_pct=round(float(ds_pct.max()), 4),
+               Det_pct=round(prof["D_e"] * 100, 4), Dn_spread_pp=round(float(dt.max() - dt.min()), 4),
+               nozzle_r_max_um=round(r_star * 1e6, 3), layer_um=round((g["Rtip"] - r_star) * 1e6, 3),
+               entry_r_max_um=round(max(entry_radius(p_, g) for p_ in tr["paths"]) * 1e6, 3),
+               release_r_max_mm=round(r0_star * 1e3, 4), layer_flow_release_pct=round(layer_flow * 100, 3),
+               layer_flow_pct=round(layer_flow_noz * 100, 3), layer_r_offset_um=round((r_star - r_equiv) * 1e6, 2),
+               area_average_pct=round(d_area, 4),
+               flow_weighted_pct=round(d_flow, 4), n_tail_099=int(np.sum(sets["pool_0.99"]["nozzle_r_um"] > r_star * 1e6)),
+               frac_above_168max_099_pct=round(float(np.mean(p99 > ds_pct.max())) * 100, 2),
+               frac_above_168max_flux_pct=round(float(np.mean(pfx > ds_pct.max())) * 100, 2),
+               r_min_um=round(float(r_tip.min()) * 1e6, 2), t_res_inner_ms=round(t_res(r_tip.min()) * 1e3, 1),
+               t_res_outer_ms=round(t_res(r_star) * 1e3, 1), Dn_mean_pct=round(float(dt.mean()), 3),
+)
+    (DATA / "analyses" / "fig5_caption_numbers.json").write_text(json.dumps(cap, indent=1))
+    print(f"  caption numbers: {cap}")
 
     mm = 1e3
-    # The panel grid.
-    fig = plt.figure(figsize=(S.PAGE_W_IN, 6.6000))
-    gs = fig.add_gridspec(3, 2, height_ratios=[1.30, 1.25, 1.00],
-                          hspace=0.66, wspace=0.48,
+    # The submitted layout.
+    fig = plt.figure(figsize=(S.PAGE_W_IN, 6.6))
+    gs = fig.add_gridspec(3, 2, height_ratios=[1.30, 1.25, 1.00], hspace=0.66, wspace=0.48,
                           left=0.088, right=0.862, top=0.930, bottom=0.070)
-
     norm = plt.Normalize(dt.min(), dt.max())
-    cmap = plt.get_cmap("viridis")
+    cmap = plt.get_cmap(S.CMAP_DT)
+    order = np.argsort(dt)                     # most damaged tracks drawn last
 
     axa = fig.add_subplot(gs[0, :])
     draw_needle(axa, g)
-    order = np.argsort(dt)                     # dirtiest tracks drawn last
     for i in order:
         p = tr["paths"][i]
-        axa.plot(p[:, 1] * mm, p[:, 0] * mm, color=cmap(norm(dt[i])),
-                 lw=0.55, alpha=0.85, zorder=3)
-    # The line is the statement; the key names it.
-    axa.axvline(g["z2"] * mm, color="#B4501F", lw=0.8, ls="--", zorder=5,
-                label="contraction to nozzle")
-    leg_a = axa.legend(loc="upper right", frameon=False, fontsize=7.5, handlelength=1.7,
-                       labelspacing=0.25, borderpad=0.1, borderaxespad=0.35,
-                       handletextpad=0.6)
-    # A small margin on the right, mirroring the one on the left, so the last tick label sits inside
-    # the axes rather than centred on its corner, clear of the colour bar.
+        axa.plot(p[:, 1] * mm, p[:, 0] * mm, color=cmap(norm(dt[i])), lw=0.55, alpha=0.85, zorder=3)
+    # The contraction is named in a key, not by text laid on the tracks.
+    axa.axvline(g["z2"] * mm, color=S.ANNOT, lw=0.8, ls="--", zorder=5, label="contraction to nozzle")
+    leg_a = axa.legend(loc="upper right", frameon=False, fontsize=7.5, handlelength=1.7, labelspacing=0.25,
+                       borderpad=0.1, borderaxespad=0.35, handletextpad=0.6)
     axa.set_xlim(Z_SEED * mm - 0.3, g["z3"] * mm + 0.35)
     axa.set_ylim(-0.09, 2.32)
     axa.set_xlabel(S.LBL["axial_z"])
     axa.set_ylabel(S.LBL["radius_mm"])
-    # The panel starts at the release plane, 5 mm into the cartridge, because the first 5 mm
-    # carries no track: it shows the tracked part of the flow path, not the whole of it.
     panel_label(axa, "A")
 
-    # No draw_needle here: this panel's y axis is in µm and the helper draws in mm. The
-    # capillary is a straight tube over this range, so two wall lines are the whole geometry.
+    # Each path is clipped to the nozzle before drawing: consecutive samples straddle the step at z2, and the
+    # segment joining them would be drawn above the 100 µm wall.
     axb = fig.add_subplot(gs[1, 0])
     Rtip_um = g["Rtip"] * 1e6
-    axb.axhspan(0.0, Rtip_um, color="#F2F2F4", zorder=0)
-    # Clip each path to the tip before drawing it.
+    axb.axhspan(0.0, Rtip_um, color=S.PANEL, zorder=0)
     for i in order:
         p = tr["paths"][i]
         _in = p[:, 1] >= g["z2"]
-        if not _in.any():
-            continue
-        axb.plot(p[_in, 1] * mm, p[_in, 0] * 1e6, color=cmap(norm(dt[i])),
-                 lw=0.6, alpha=0.9, zorder=3)
+        if _in.any():
+            axb.plot(p[_in, 1] * mm, p[_in, 0] * 1e6, color=cmap(norm(dt[i])), lw=0.6, alpha=0.9, zorder=3)
     axb.set_xlim(g["z2"] * mm - 0.15, g["z3"] * mm)
     axb.set_ylim(-0.10 * Rtip_um, 1.20 * Rtip_um)
     axb.axhline(Rtip_um, color="#444444", lw=0.9, zorder=4)
@@ -312,139 +473,80 @@ def main():
     axb.set_xlabel(S.LBL["axial_z"])
     axb.set_ylabel(S.LBL["radius_um"])
     panel_label(axb, "B")
+    _worst = max(float(np.max(np.abs(p[p[:, 1] >= g["z2"], 0]))) for p in tr["paths"] if (p[:, 1] >= g["z2"]).any())
+    assert _worst <= g["Rtip"] + 3e-6, f"a drawn tracer reaches r = {_worst*1e6:.1f} µm in a {Rtip_um:.0f} µm bore"
+    print(f"  panel B containment: worst drawn radius {_worst*1e6:.1f} µm of {Rtip_um:.0f} µm bore")
 
-    # Nothing may be drawn outside the bore. Measured against the geometry, not eyeballed.
-    _worst = max(float(np.max(np.abs(tr["paths"][i][tr["paths"][i][:, 1] >= g["z2"], 0])))
-                 for i in order if (tr["paths"][i][:, 1] >= g["z2"]).any())
-    assert _worst <= g["Rtip"] + 3e-6, (
-        f"a drawn tracer reaches r = {_worst*1e6:.1f} µm in a {g['Rtip']*1e6:.0f} µm bore")
-    print(f"  panel (b) containment: worst drawn radius {_worst*1e6:.1f} µm "
-          f"of {g['Rtip']*1e6:.0f} µm bore")
-
-    # Shear damage, not total.
+    # Shear damage, not D_n: on D_n the tenfold rise sits on the common entrance term and reads as a wiggle.
     axc = fig.add_subplot(gs[1, 1])
-    ds_pct = tr["D_s"] * 100
-    axc.scatter(r_tip * 1e6, ds_pct, s=13, c=dt, cmap=cmap, norm=norm,
-                edgecolor="#333333", linewidth=0.35, zorder=3)
+    axc.scatter(r_tip * 1e6, ds_pct, s=13, c=dt, cmap=cmap, norm=norm, edgecolor=S.INK, linewidth=0.35, zorder=3)
     axc.set_yscale("log")
-    axc.set_ylim(ds_pct.min() / 1.4, ds_pct.max() * 1.4)
+    lo_c, hi_c = ds_pct.min() / 1.4, ds_pct.max() * 1.4
+    axc.set_ylim(lo_c, hi_c)
     from matplotlib.ticker import FixedLocator, FixedFormatter, NullLocator
-    _ticks = [t for t in (0.02, 0.05, 0.1, 0.2, 0.5, 1.0) if ds_pct.min() / 1.4 <= t <= ds_pct.max() * 1.4]
+    _ticks = [t for t in (0.02, 0.05, 0.1, 0.2, 0.5, 1.0) if lo_c <= t <= hi_c]
     axc.yaxis.set_major_locator(FixedLocator(_ticks))
     axc.yaxis.set_major_formatter(FixedFormatter([f"{t:g}" for t in _ticks]))
     axc.yaxis.set_minor_locator(NullLocator())
-    # The result value belongs in the caption, not on the axes; it is printed to stdout so
-    # the caption stays in step with the data.
-    print(f"  caption (c)  ·  shear damage {ds_pct.min():.2f} % on the axis to {ds_pct.max():.2f} % "
-          f"at the outermost tracer; D_et = {prof['D_e']*100:.2f} %, identical for every tracer")
-    axc.set_xlabel(S.LBL["entry_r"])
+    axc.set_xlabel("Radius in the nozzle (µm)")
     axc.set_ylabel("Shear damage  $D_s$  (%)")
     panel_label(axc, "C")
 
     axd = fig.add_subplot(gs[2, :])
     axd.hist(dt, bins=28, color="#4C6E8A", edgecolor="#243B4A", linewidth=0.6, zorder=3)
-    axd.axvline(prof["D_e"] * 100, color="#B4501F", lw=1.2, ls="--", zorder=4,
-                label="extensional floor  $D_{et}$")
-    axd.legend(loc="upper right", frameon=False, fontsize=7.5, handlelength=1.7,
-               borderaxespad=0.3)
-    axd.set_xlabel("Cumulative  $D_t$  at the outlet (%)")
+    axd.axvline(prof["D_e"] * 100, color=S.ANNOT, lw=1.2, ls="--", zorder=4,
+                label="entrance-associated damage  $D_{et}$")
+    leg_d = axd.legend(loc="upper right", frameon=False, fontsize=7.5, handlelength=1.7, borderaxespad=0.3)
+    axd.set_xlabel("Damage  $D_n$  at the outlet (%)")
     axd.set_ylabel("Tracers")
     panel_label(axd, "D")
-# Journal rule: figure titles and legends go in the main manuscript, never inside the
-# graphic file, so the numbers the caption quotes are printed to stdout instead.
-    span = dt.max() - dt.min()
-    print(f"  for the caption: population spans {span:.3f} pp "
-          f"({span / dt.mean() * 100:.1f} % of the mean), extensional floor "
-          f"{prof['D_e']*100:.2f} pp")
 
-    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
-    # The bar is placed from panel (a), not from four literals.
+    # The colour bar is placed from panel A, so it is that panel's height and reads as its scale.
     _pa = axa.get_position()
     cax = fig.add_axes([_pa.x1 + 0.043, _pa.y0, 0.015, _pa.height])
-    cb = fig.colorbar(sm, cax=cax)
-    cb.set_label(S.LBL["damage_cum"], fontsize=S.PAPER["label"])
+    cb = fig.colorbar(plt.cm.ScalarMappable(cmap=cmap, norm=norm), cax=cax)
+    cb.set_label("Damage  $D_n$  (%)", fontsize=S.PAPER["label"])
     cb.ax.tick_params(labelsize=S.PAPER["tick"])
 
-    # Every check above this line is on numbers: the damage law against Ning's two self- tests, the
-    # profile against the canonical grid, the drawn tracks against the bore.
     fig.canvas.draw()
     rend = fig.canvas.get_renderer()
-    panels = [("(a)", axa), ("(b)", axb), ("(c)", axc), ("(d)", axd), ("colour bar", cax)]
-    MIN_PX = 12.0     # 0.12 in on the 100 dpi draw canvas, about 8.6 pt on the page
-
-    # 1.
+    panels = [("A", axa), ("B", axb), ("C", axc), ("D", axd), ("colour bar", cax)]
+    MIN_PX = 12.0
+    # 1. No loose text on a data panel; the panel letter is the only text.
     for _pn, _pax in panels[:4]:
-        _loose = [t.get_text() for t in _pax.texts
-                  if (t.get_text() or "").strip() and (t.get_text() or "").strip() not in "ABCD"]
-        assert not _loose, (
-            f"panel {_pn} carries {len(_loose)} loose annotation(s) {_loose}; "
-            f"name the object in the key instead of writing on the panel")
-
-    # 2. no key may reach into a panel that is not its own.
-    for _kname, _key, _home in [("panel (a) key", leg_a, axa)]:
+        _loose = [t.get_text() for t in _pax.texts if (t.get_text() or "").strip() not in "ABCD"]
+        assert not _loose, f"panel {_pn} carries loose text {_loose}"
+    # 2. No key reaches into another panel.
+    for _kname, _key, _home in (("A key", leg_a, axa), ("D key", leg_d, axd)):
         _kb = _key.get_window_extent(rend)
         for _pn, _pax in panels:
-            if _pax is _home:
-                continue
-            _d = clearance_px(_kb, _pax.get_window_extent(rend))
-            assert _d > 0, f"the {_kname} reaches {-_d:.1f} px into panel {_pn}"
-
-    # 3.
+            if _pax is not _home:
+                assert clearance_px(_kb, _pax.get_window_extent(rend)) > 0, f"the {_kname} reaches into {_pn}"
+    # 3. The A key does not cover a track: its lower edge is compared with the tracks over the span it covers.
     _kd = leg_a.get_window_extent(rend).transformed(axa.transData.inverted())
     _kz0, _kz1 = min(_kd.x0, _kd.x1) / mm, max(_kd.x0, _kd.x1) / mm
-    _under_key = 0.0
-    for _p in tr["paths"]:
-        _m = (_p[:, 1] >= _kz0) & (_p[:, 1] <= _kz1)
-        if _m.any():
-            _under_key = max(_under_key, float(np.max(np.abs(_p[_m, 0]))))
-    _under_key *= mm
-    _key_floor = min(_kd.y0, _kd.y1)
-    assert _key_floor > _under_key, (
-        f"the panel (a) key hangs down to r = {_key_floor:.2f} mm while the tracks under it "
-        f"reach r = {_under_key:.2f} mm; it is sitting on the data")
-
-    # 4.
-    _tight = [(n, a.get_tightbbox(rend)) for n, a in panels]
+    _under_key = max((float(np.max(np.abs(p[(p[:, 1] >= _kz0) & (p[:, 1] <= _kz1), 0])))
+                      for p in tr["paths"] if ((p[:, 1] >= _kz0) & (p[:, 1] <= _kz1)).any()), default=0.0) * mm
+    assert min(_kd.y0, _kd.y1) > _under_key, "the A key sits on the tracks"
+    # 4. The D key does not cover a bar of the histogram.
+    _kbd = leg_d.get_window_extent(rend)
+    for _bar in axd.patches:
+        assert clearance_px(_kbd, _bar.get_window_extent(rend)) > 0, "the D key covers a histogram bar"
+    # 5. No two panels touch, labels included.
+    _tight = [(n_, a.get_tightbbox(rend)) for n_, a in panels]
     _worst, _pair = float("inf"), None
     for _i in range(len(_tight)):
         for _j in range(_i + 1, len(_tight)):
             _d = clearance_px(_tight[_i][1], _tight[_j][1])
             if _d < _worst:
                 _worst, _pair = _d, (_tight[_i][0], _tight[_j][0])
-    assert _worst >= MIN_PX, (
-        f"{_pair[0]} and {_pair[1]} are {_worst:.1f} px apart, under the "
-        f"{MIN_PX:.0f} px minimum")
-
-    # 5.
-    _wl, _wln = float("inf"), None
-    for _pn, _pax in panels[:4]:
-        _ti = next((t for t in _pax.texts
-                    if (t.get_text() or "").strip() in "ABCD"), None)
-        if _ti is None:
-            continue
-        _d = (_ti.get_window_extent(rend).y0
-              - _pax.yaxis.label.get_window_extent(rend).y1)
-        if _d < _wl:
-            _wl, _wln = _d, _pn
-    assert _wln is not None, "no panel letter was found to measure; the guard tested nothing"
-    assert _wl >= -MIN_PX, (
-        f"panel {_wln}'s y label rises {-_wl:.1f} px past its panel letter, "
-        f"more than the {MIN_PX:.0f} px tolerance")
-
-    # 6.
-    assert abs(axb.get_position().width - axc.get_position().width) < 1e-9, (
-        f"(b) and (c) differ in width: {axb.get_position().width:.6f} vs "
-        f"{axc.get_position().width:.6f}")
-
-    print(f"  layout guard: {len(panels)} boxes, tightest pair {_pair[0]}/{_pair[1]} at "
-          f"{_worst:.1f} px · tightest y-label-to-title {_wln} at {_wl:.1f} px · key clears "
-          f"the tracks by {_key_floor - _under_key:.2f} mm · (b) and (c) equal width")
+    assert _worst >= MIN_PX, f"{_pair[0]} and {_pair[1]} are {_worst:.1f} px apart, under {MIN_PX:.0f}"
+    # 6. B and C are the same width.
+    assert abs(axb.get_position().width - axc.get_position().width) < 1e-9
+    print(f"  layout guard: tightest pair {_pair[0]}/{_pair[1]} at {_worst:.1f} px; keys clear of data")
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    # Panel letters snap to each panel's real top-left corner once the layout is fixed.
     S.snap_panel_labels(fig)
-    # The two save-time guards every save_figure figure runs (this figure keeps its own output
-    # path, so it calls them directly): no key over data, no ink at the canvas edge.
     S.assert_keys_clear_of_data(fig)
     S.assert_ink_inside_canvas(fig)
     fig.savefig(OUT, dpi=600, facecolor="white")

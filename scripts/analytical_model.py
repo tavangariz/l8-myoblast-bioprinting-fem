@@ -13,14 +13,16 @@ import argparse, sys, warnings
 import numpy as np
 import pandas as pd
 import scipy.integrate as integrate
+
+from l8_geometry import L_NEEDLE, TIP_RADIUS_M  # one definition of the domain for every script
 warnings.filterwarnings("ignore")
 
 K_vis, n_exp, rho = 25.60, 0.35, 990.0
 # Ning et al. 2018, acs Biomater.
 a1, b1, c1 = 3.20e-4, 0.61, 0.52   # Ning 2018, L8 shear       (= 0.00032, 0.61, 0.52)
 a2, b2     = 1.43e-3, 0.55         # Ning 2018, L8 extensional (= 0.00143, 0.55)
-Ltip       = 10e-3
-NEEDLES    = {"100": 50e-6, "200": 100e-6, "250": 125e-6, "330": 165e-6}
+Ltip       = L_NEEDLE
+NEEDLES    = {str(d): r for d, r in TIP_RADIUS_M.items()}
 PRESSURES  = [25, 50, 75, 100, 150, 200, 300, 400]
 NING_Q     = {50: 2.6e-4, 100: 1.8e-3, 200: 1.7e-2, 300: 4.1e-2, 400: 9.8e-2}
 NING_TAU   = {50: 246, 100: 491, 200: 981, 400: 1909}

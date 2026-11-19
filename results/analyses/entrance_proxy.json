@@ -1,0 +1,95 @@
+{
+ "cases": [
+  {
+   "file": "M12_D200_P200.pkl",
+   "D_um": 200.0,
+   "P_kPa": 200.0,
+   "Re": 1.22,
+   "peak_strain_rate_s": 5441.6,
+   "fwhm_um": 131.9,
+   "hencky_strain": 5.743,
+   "exposure_ms": 0.2793,
+   "resolved_axial_stress_Pa": 1090.9,
+   "tau_e_Pa": 1901.7,
+   "P_en_kPa": 3.756,
+   "Det_pct": 8.695
+  },
+  {
+   "file": "M12_D330_P400.pkl",
+   "D_um": 330.0,
+   "P_kPa": 400.0,
+   "Re": 194.81,
+   "peak_strain_rate_s": 55345.1,
+   "fwhm_um": 231.6,
+   "hencky_strain": 4.694,
+   "exposure_ms": 0.0302,
+   "resolved_axial_stress_Pa": 2456.8,
+   "tau_e_Pa": 59727.3,
+   "P_en_kPa": 117.98,
+   "Det_pct": 45.429
+  },
+  {
+   "file": "M16_D200_P200.pkl",
+   "D_um": 200.0,
+   "P_kPa": 200.0,
+   "Re": 1.22,
+   "peak_strain_rate_s": 5485.5,
+   "fwhm_um": 124.9,
+   "hencky_strain": 5.743,
+   "exposure_ms": 0.2576,
+   "resolved_axial_stress_Pa": 1094.0,
+   "tau_e_Pa": 1901.3,
+   "P_en_kPa": 3.756,
+   "Det_pct": 8.694
+  },
+  {
+   "file": "M16_D330_P400.pkl",
+   "D_um": 330.0,
+   "P_kPa": 400.0,
+   "Re": 195.51,
+   "peak_strain_rate_s": 55285.1,
+   "fwhm_um": 210.6,
+   "hencky_strain": 4.691,
+   "exposure_ms": 0.0265,
+   "resolved_axial_stress_Pa": 2455.9,
+   "tau_e_Pa": 59619.3,
+   "P_en_kPa": 117.767,
+   "Det_pct": 45.396
+  },
+  {
+   "file": "M12_D250_P263.pkl",
+   "D_um": 250.0,
+   "P_kPa": 263.0,
+   "Re": 17.35,
+   "peak_strain_rate_s": 19782.2,
+   "fwhm_um": 173.9,
+   "hencky_strain": 5.307,
+   "exposure_ms": 0.0731,
+   "resolved_axial_stress_Pa": 1713.9,
+   "tau_e_Pa": 6202.7,
+   "P_en_kPa": 12.252,
+   "Det_pct": 15.994
+  },
+  {
+   "file": "M12_D330_P186.3.pkl",
+   "D_um": 330.0,
+   "P_kPa": 186.3,
+   "Re": 20.05,
+   "peak_strain_rate_s": 15217.8,
+   "fwhm_um": 232.2,
+   "hencky_strain": 4.748,
+   "exposure_ms": 0.0951,
+   "resolved_axial_stress_Pa": 1563.6,
+   "tau_e_Pa": 6174.5,
+   "P_en_kPa": 12.197,
+   "Det_pct": 15.957
+  }
+ ],
+ "ratio_high_over_reference": {
+  "peak_strain_rate_s": 10.171,
+  "hencky_strain": 0.817,
+  "exposure_ms": 0.108,
+  "resolved_axial_stress_Pa": 2.252,
+  "tau_e_Pa": 31.407
+ }
+}

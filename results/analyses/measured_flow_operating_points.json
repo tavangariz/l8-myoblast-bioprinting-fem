@@ -1,0 +1,26 @@
+{
+ "100": {
+  "P_model": 298.5,
+  "Dt_model": 11.84,
+  "P_meas": null,
+  "Dt_meas": null
+ },
+ "200": {
+  "P_model": 72.7,
+  "Dt_model": 9.92,
+  "P_meas": 80.7,
+  "Dt_meas": 10.13
+ },
+ "250": {
+  "P_model": 46.5,
+  "Dt_model": 9.5,
+  "P_meas": 51.1,
+  "Dt_meas": 9.65
+ },
+ "330": {
+  "P_model": 26.6,
+  "Dt_model": 9.05,
+  "P_meas": 29.0,
+  "Dt_meas": 9.17
+ }
+}

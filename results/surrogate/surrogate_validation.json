@@ -1,5 +1,5 @@
 {
- "grid": "L8_FEM_canonical_2026-08-27.csv",
+ "grid": "L8_FEM_canonical_2026-10-31.csv",
  "n_cases": 32,
  "diameters_um": [
   100.0,
@@ -94,8 +94,8 @@
     "mean_width": 0.1357999045851121
    },
    "decisions": {
-    "accepted_by_fem": 17,
-    "accepted_by_surrogate": 17,
+    "accepted_by_fem": 16,
+    "accepted_by_surrogate": 16,
     "wrongly_accepted": 0,
     "wrongly_rejected": 0
    },
@@ -151,8 +151,8 @@
     "mean_width": 0.15666844733240481
    },
    "decisions": {
-    "accepted_by_fem": 17,
-    "accepted_by_surrogate": 16,
+    "accepted_by_fem": 16,
+    "accepted_by_surrogate": 15,
     "wrongly_accepted": 0,
     "wrongly_rejected": 1
    },
@@ -294,9 +294,9 @@
     "mean_width": 1.0336046916863142
    },
    "decisions": {
-    "accepted_by_fem": 17,
-    "accepted_by_surrogate": 18,
-    "wrongly_accepted": 2,
+    "accepted_by_fem": 16,
+    "accepted_by_surrogate": 16,
+    "wrongly_accepted": 1,
     "wrongly_rejected": 1
    },
    "optimizer_warnings": 2,
@@ -618,25 +618,29 @@
   {
    "needle_um": 100.0,
    "P_kPa": 298.5,
-   "Dt_pct": 7.535827162459917,
+   "Dt_pct": 11.836649632116325,
+   "Dn_pct": 7.535827162459919,
    "Q_uLs": 1.0003012592706475
   },
   {
    "needle_um": 200.0,
    "P_kPa": 72.7,
-   "Dt_pct": 5.524305916201871,
+   "Dt_pct": 9.91869106541956,
+   "Dn_pct": 5.52430591620187,
    "Q_uLs": 1.0025791805660715
   },
   {
    "needle_um": 250.0,
    "P_kPa": 46.5,
-   "Dt_pct": 5.081133190691498,
+   "Dt_pct": 9.496131807345517,
+   "Dn_pct": 5.081133190691495,
    "Q_uLs": 1.0050968842210735
   },
   {
    "needle_um": 330.0,
    "P_kPa": 26.6,
-   "Dt_pct": 4.610343035731548,
+   "Dt_pct": 9.047239700189472,
+   "Dn_pct": 4.610343035731548,
    "Q_uLs": 1.001971605343537
   }
  ],
@@ -648,22 +652,22 @@
    "system": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39"
   },
   "software": {
-   "python": "3.13.9",
-   "numpy": "2.2.5",
+   "python": "3.12.3",
+   "numpy": "2.2.6",
    "scipy": "1.15.3",
    "scikit_learn": "1.7.2"
   },
-  "fit_three_gps_s": 1.004775724002684,
+  "fit_three_gps_s": 0.6685435010003857,
   "fit_repeats": 5,
   "single_query_ms": {
-   "median": 0.07680099952267483,
-   "p95": 0.13425704855762885,
+   "median": 0.07269749949045945,
+   "p95": 0.10961269890685797,
    "repeats": 2000
   },
   "operating_window_sweep": {
    "points": 15004,
    "outputs": 2,
-   "median_s": 0.1447040305029077,
+   "median_s": 0.1292000419998658,
    "repeats": 50
   },
   "fem_campaign": {

@@ -5,10 +5,12 @@ title: "L8 myoblast bioprinting finite element and Gaussian process framework"
 abstract: >-
   Axisymmetric finite element model (DOLFINx 0.10) of shear-thinning flow, with inertia,
   through the cartridge and nozzle of an extrusion bioprinter, coupled to the damage law of
-  Ning et al. (2018) for L8 myoblasts, and a Gaussian process surrogate that maps applied
+  Ning and co-workers (2018) for L8 myoblasts, and a Gaussian process surrogate that maps applied
   pressure and nozzle diameter to flow rate, wall shear stress and predicted cell damage.
-  Includes the 32-case simulation grid, the surrogate validation, the comparisons with
-  published data and the scripts behind every figure of the accompanying article.
+  The damage law includes a pressure-independent term fitted to the damage measured in that
+  study. Includes the 32-case simulation grid, the surrogate validation and its comparison with interpolants, the FEM
+  checks of the operating window, the comparisons with published data, the same pipeline
+  for RSC96 Schwann cells and the scripts behind every figure of the accompanying article.
 authors:
   - family-names: Tavangari
     given-names: Zahed
@@ -33,11 +35,11 @@ keywords:
   - cell damage
   - L8 myoblast
   - operating window
-version: "1.0.0"
-date-released: "2026-10-19"
+version: "1.1.0"
+date-released: "2026-11-19"
 preferred-citation:
   type: article
-  title: "Fast computational screening of extrusion parameters for bioprinting of skeletal myoblasts in alginate hydrogel"
+  title: "Computational screening of nozzle diameter and applied pressure for extrusion bioprinting of L8 skeletal myoblasts in alginate hydrogel"
   authors:
     - family-names: Tavangari
       given-names: Zahed

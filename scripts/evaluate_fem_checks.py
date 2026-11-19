@@ -3,8 +3,10 @@
 
 The checks were fixed by prespecify_fem_checks.py from the surrogate's predictions before any of
 them was solved. Each solved check is reduced through l8_damage.derive, as a grid case, and
-compared with the prediction recorded in PRESPECIFIED_CASES.csv; nothing is refitted. The script
-stops unless every check is present and converged at full density.
+compared with the prediction recorded in PRESPECIFIED_CASES.csv; nothing is refitted. Errors are
+taken on the condition-dependent damage Dn, which the surrogate emulates, and the window decision on
+the total damage Dt = D0 + (1 - D0) Dn (Eq. 25). The script stops unless every check is present and
+converged at full density.
 
     python scripts/evaluate_fem_checks.py
 """
@@ -39,8 +41,9 @@ def main() -> int:
         fem = derive(p, q, d * 0.5e-6)
         dt_pred, dt_sd = float(c["gp_Dt_pct"]), float(c["gp_Dt_sd_pp"])
         lq_pred, lq_sd = float(c["gp_log10_Q"]), float(c["gp_log10_Q_sd"])
-        ok_fem = fem["Dt_pct"] < S.DT_MAX and q >= S.Q_MIN
-        ok_pred = dt_pred < S.DT_MAX and 10 ** lq_pred >= S.Q_MIN
+        ok_fem = fem["Dt_pct"] < S.DT_MAX and q >= S.Q_MIN                 # total, with D0
+        ok_pred = S.total_from_dn(dt_pred) < S.DT_MAX and 10 ** lq_pred >= S.Q_MIN
+        fem = dict(fem, Dt_pct=fem["Dn_pct"])                              # errors on Dn, as trained
         out.append({"case": c["case"], "role": c["role"], "needle_um": d, "pressure_kPa": p,
                     "Dt_fem_pct": round(fem["Dt_pct"], 4), "Dt_pred_pct": dt_pred,
                     "Dt_err_pp": round(dt_pred - fem["Dt_pct"], 4),

@@ -1,0 +1,5 @@
+case,role,needle_um,pressure_kPa,Dt_fem_pct,Dt_pred_pct,Dt_err_pp,Dt_inside95,Q_fem_uLs,Q_pred_uLs,Q_err_pct,log10_Q_inside95,Dt_total_fem_pct,accepted_fem,accepted_pred,Dt_total_pred_pct,limit_offset_kPa
+M12_D200_P343.9,dt_total_boundary,200.0,343.9,15.9417,16.1033,0.1616,1,80.55106,83.10505,3.171,1,19.8515,1,0,20.0056,2.06
+M12_D250_P263,dt_total_boundary,250.0,263.0,16.1366,16.1061,-0.0305,1,133.52339,134.99624,1.103,1,20.0374,0,0,20.0083,-0.41
+M12_D330_P186.3,dt_total_boundary,330.0,186.3,16.0907,16.1034,0.0127,1,239.39755,237.5347,-0.778,1,19.9936,1,0,20.0057,0.05
+M12_D290_P217.3,dt_total_boundary,290.0,217.3,15.9558,16.1086,0.1528,1,179.90764,179.32571,-0.323,1,19.865,1,0,20.0107,1.25
