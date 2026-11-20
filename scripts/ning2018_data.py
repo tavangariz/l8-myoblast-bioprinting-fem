@@ -10,8 +10,8 @@ Every entry says where its number comes from:
                matching, axes from the tick marks); the 200 µm points of Fig. 7, which the text also
                prints, reproduce to within 0.03 percentage points, which bounds the reading error.
 
-Nothing in this module is fitted. Damage is the percentage of damaged cells (Annexin V-FITC positive,
-injured, plus propidium iodide positive, dead) counted immediately after printing.
+Nothing in this module is fitted. Damage is the percentage of damaged cells (stained by Annexin V-FITC
+only, injured, or by both Annexin V-FITC and propidium iodide, dead) counted immediately after printing.
 """
 from __future__ import annotations
 

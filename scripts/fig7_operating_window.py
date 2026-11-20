@@ -22,6 +22,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.interpolate import PchipInterpolator
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
@@ -52,6 +53,72 @@ def reference_flow(rows):
     return float(hits[0]["Q_uLs"])
 
 
+# The column layout, in mm, computed from measured ink (B under A).
+PAD_MM = 1.5          # canvas margin around the outermost ink
+PANEL_H_MM = 50.0     # plot-box height of each panel (side by side they were about 52 mm)
+CB_GAP_MM = 2.5       # panel (a) to its colour bar, as in the side-by-side figure
+CB_W_MM = 3.5         # colour-bar width
+KEY_GAP_MM = 1.2      # axis title to the first row of its key
+ROW_GAP_MM = 5.0      # panel (a)'s key to panel (b)'s letter
+
+
+def layout_column(fig, axa, cax, axb, leg_a, leg_b):
+    """Place (a) over (b) on the 170 mm canvas from measured ink; set the canvas height to fit.
+
+    Ink extents are in points (type, ticks, bar), so they barely move when the boxes are
+    resized; three passes land on a fixed point. The keys are measured but hidden while the
+    panel ink is measured, because a key is a child of its axes and would otherwise count as
+    the panel's own text, and the panel letters are snapped with the keys hidden for the same
+    reason.
+    """
+    W = S.PAGE_W_MM
+    for _ in range(3):
+        for leg in (leg_a, leg_b):
+            leg.set_visible(False)
+        S.snap_panel_labels(fig)
+        fig.canvas.draw()
+        r = fig.canvas.get_renderer()
+        mm = 25.4 / fig.dpi
+
+        def ext(a):
+            box, ink = a.get_window_extent(r), a.get_tightbbox(r)
+            return ((box.x0 - ink.x0) * mm, (ink.x1 - box.x1) * mm,
+                    (box.y0 - ink.y0) * mm, (ink.y1 - box.y1) * mm)   # left, right, below, above
+
+        ea, eb, ec = ext(axa), ext(axb), ext(cax)
+        for leg in (leg_a, leg_b):
+            leg.set_visible(True)
+        fig.canvas.draw()
+        ka = leg_a.get_window_extent(r).height * mm
+        kb = leg_b.get_window_extent(r).height * mm
+        left = PAD_MM + max(ea[0], eb[0])
+        wa = W - PAD_MM - left - CB_GAP_MM - CB_W_MM - ec[1]
+        wb = W - PAD_MM - left - eb[1]
+        H = (PAD_MM + ea[3] + PANEL_H_MM + ea[2] + KEY_GAP_MM + ka + ROW_GAP_MM
+             + eb[3] + PANEL_H_MM + eb[2] + KEY_GAP_MM + kb + PAD_MM)
+        fig.set_size_inches(W / 25.4, H / 25.4)
+        ya = H - PAD_MM - ea[3] - PANEL_H_MM
+        yb = PAD_MM + kb + KEY_GAP_MM + eb[2]
+        axa.set_position([left / W, ya / H, wa / W, PANEL_H_MM / H])
+        cax.set_position([(left + wa + CB_GAP_MM) / W, ya / H, CB_W_MM / W, PANEL_H_MM / H])
+        axb.set_position([left / W, yb / H, wb / W, PANEL_H_MM / H])
+        # Each key hangs KEY_GAP_MM under its own axis title. (a)'s is centred under the panel
+        # and its colour bar, the block it describes; (b)'s under its panel.
+        leg_a.set_loc("upper center")
+        leg_a.set_bbox_to_anchor(((left + 0.5 * (wa + CB_GAP_MM + CB_W_MM)) / W,
+                                  (ya - ea[2] - KEY_GAP_MM) / H), transform=fig.transFigure)
+        leg_b.set_loc("upper center")
+        leg_b.set_bbox_to_anchor(((left + 0.5 * wb) / W, (yb - eb[2] - KEY_GAP_MM) / H),
+                                 transform=fig.transFigure)
+    for leg in (leg_a, leg_b):
+        leg.set_visible(False)
+    S.snap_panel_labels(fig)
+    for leg in (leg_a, leg_b):
+        leg.set_visible(True)
+    print(f"  layout: panel (a) {wa:.1f} x {PANEL_H_MM:.0f} mm, panel (b) {wb:.1f} x "
+          f"{PANEL_H_MM:.0f} mm, on a {W:.0f} x {H:.1f} mm canvas")
+
+
 def main():
     rows = SUR.load_grid()
     Q_REF = reference_flow(rows)
@@ -73,11 +140,11 @@ def main():
     # of the style. At 600 dpi the default 1.0 pt prints as a hairline over a filled contour.
     plt.rcParams["hatch.linewidth"] = 1.5
     P = S.PAPER
-    # The height includes room for panel (a)'s key below the axes: a key outside costs vertical space
-    # rather than covering data.
-    fig, (axa, axb) = plt.subplots(1, 2, figsize=(S.PAGE_W_IN, 4.0500), dpi=P["dpi"],
-                                   gridspec_kw=dict(wspace=0.56))
-    cax = axa.inset_axes([1.035, 0.0, 0.042, 1.0], transform=axa.transAxes)
+    # One column, B under A, so that both panels are larger and easier to read.
+    fig, (axa, axb) = plt.subplots(2, 1, figsize=(S.PAGE_W_IN, 7.0), dpi=P["dpi"])
+    # The colour bar is its own axes, placed by layout_column() at a fixed gap and width in mm
+    # beside panel (a), so it never takes width from (a) and does not stretch when (a) widens.
+    cax = fig.add_axes([0.9, 0.6, 0.02, 0.3])
 
     pp = np.linspace(25, 400, 260)
     dd = np.linspace(min(dias), max(dias), 240)
@@ -187,9 +254,10 @@ def main():
         Line2D([], [], color=S.INK, lw=1.1, ls=":", label="$\\tau_e$ = 440 and 9251 Pa"),
         Line2D([], [], color=S.INK, lw=1.0, ls="-.", label="$\\tau_w$ = 100 and 1000 Pa"),
     ] + [
-    # Two by two, not one row of four.
-    ], loc="upper center", bbox_to_anchor=(0.5, -0.155), ncol=2, frameon=False,
-        fontsize=P["legend"] - 0.5, handlelength=1.9, columnspacing=1.3,
+    # Three columns under the full-width panel: markers, then region and constraints, then the
+    # calibration ranges.
+    ], loc="upper center", bbox_to_anchor=(0.5, -0.155), ncol=3, frameon=False,
+        fontsize=P["legend"], handlelength=1.9, columnspacing=2.0,
         borderaxespad=0.0)
 
     for d in dias:
@@ -210,10 +278,12 @@ def main():
         if not (min(qs) <= Q_REF <= max(qs)):
             out_of_range.append(d)
             continue
-        at_ref[d] = float(np.interp(np.log10(Q_REF), np.log10(qs), [r["Dt_pct"] for r in s]))
+        # monotone in log10 Q (PCHIP), the method the text states and scripts/matched_flow.py uses; panel B draws
+        # straight segments between the solved cases, which differ from it by up to 0.12 pp at Q_REF (250 µm)
+        at_ref[d] = float(PchipInterpolator(np.log10(qs), [r["Dt_pct"] for r in s])(np.log10(Q_REF)))
     # Named in the key.
     axb.axvline(Q_REF, ymax=0.975, color=S.ANNOT, lw=1.4, ls=":", zorder=2,
-                label=f"$Q$ = {Q_REF:.2f} µL/s, reference condition")
+                label=f"$Q$ = {Q_REF:.1f} µL/s, reference condition")
     # Journal rule: figure titles and legends go in the main manuscript, never inside the graphic
     # file.
 
@@ -227,54 +297,115 @@ def main():
     axb.set_ylabel(S.LBL["damage_t"])
     S.panel_label(axb, "B")
     # Outside the axes, under the panel, like panel (a)'s key.
-    leg_b = axb.legend(loc="upper center", bbox_to_anchor=(0.5, -0.150), ncol=2,
-                       frameon=False, fontsize=P["legend"] - 0.5, handlelength=1.9,
-                       columnspacing=1.3, borderaxespad=0.0)
+    leg_b = axb.legend(loc="upper center", bbox_to_anchor=(0.5, -0.150), ncol=3,
+                       frameon=False, fontsize=P["legend"], handlelength=1.9,
+                       columnspacing=2.0, borderaxespad=0.0)
 
-    # No tight_layout: it re-solves the column widths and would undo the equal split, and it cannot
-    # see an inset colour bar as something needing room.
-    fig.subplots_adjust(left=0.085, right=0.975, top=0.9259, bottom=0.3535)
-    S.snap_panel_labels(fig)
+    # An inset magnifies the empty upper left of (b), where the curves meet the reference line.
+    INSET_QSPAN, INSET_DPAD = 2.2, 1.0
+    drawn_at_ref = {}
+    for d in at_ref:
+        s = by[d]
+        drawn_at_ref[d] = float(np.interp(np.log10(Q_REF), np.log10([r["Q_uLs"] for r in s]),
+                                          [r["Dt_pct"] for r in s]))
+    i_x = (Q_REF / INSET_QSPAN, Q_REF * INSET_QSPAN)
+    i_y = (np.floor(2 * (min(drawn_at_ref.values()) - INSET_DPAD)) / 2,
+           np.ceil(2 * (max(drawn_at_ref.values()) + INSET_DPAD)) / 2)
+    # Upper left of (b), the empty region: above the 20 % limit line, left of the dotted reference
+    # line.
+    axins = axb.inset_axes([0.075, 0.43, 0.43, 0.52])
+    axins.set_facecolor("white")
+    for d in dias:
+        rr = by[d]
+        axins.semilogx([r["Q_uLs"] for r in rr], [r["Dt_pct"] for r in rr],
+                       marker=S.dia_marker(d), ls="-",
+                       color=S.dia_color(d), lw=P["lw_data"], ms=P["ms"],
+                       mec="white", mew=0.8, label="_nolegend_", zorder=3)
+    axins.axvline(Q_REF, color=S.ANNOT, lw=1.4, ls=":", zorder=2, label="_nolegend_")
+    axins.set_xlim(*i_x)
+    axins.set_ylim(*i_y)
+    # Few, readable ticks: three flow rates in plain numbers and whole percentage points.
+    from matplotlib.ticker import FixedLocator, NullLocator, FuncFormatter, MultipleLocator
+    axins.xaxis.set_major_locator(FixedLocator([10, 20, 30]))
+    axins.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+    axins.xaxis.set_minor_locator(NullLocator())
+    axins.yaxis.set_major_locator(MultipleLocator(1.0))
+    axins.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:g}"))
+    axins.tick_params(labelsize=P["tick"])
+    _ind = axb.indicate_inset_zoom(axins, edgecolor=S.MUTE, linewidth=0.8, alpha=1.0)
+    # The connectors run from the frame's top corners to the inset's bottom corners.
+    from matplotlib.patches import ConnectionPatch
+    for _c in _ind.connectors:
+        _c.set_visible(False)
+    zoom_links = []
+    for _ins_xy, _main_xy in (((0, 0), (i_x[0], i_y[1])), ((1, 0), (i_x[1], i_y[1]))):
+        _cp = ConnectionPatch(xyA=_ins_xy, coordsA=axins.transAxes, xyB=_main_xy,
+                              coordsB=axb.transData, arrowstyle="-", color=S.MUTE,
+                              linewidth=0.8, zorder=2.5)
+        axb.add_artist(_cp)
+        zoom_links.append(_cp)
+    print(f"  inset limits: Q {i_x[0]:.2f} to {i_x[1]:.2f} µL/s, D_t {i_y[0]:.1f} to {i_y[1]:.1f} %")
+    print(f"  inset at Q_REF = {Q_REF:.2f} µL/s, drawn curve (linear in log10 Q) vs PCHIP (text): "
+          + " · ".join(f"Ø{d} {drawn_at_ref[d]:.2f} / {at_ref[d]:.2f} %" for d in sorted(at_ref)))
+    _ordered = [drawn_at_ref[d] for d in sorted(drawn_at_ref)]
+    assert all(a > b for a, b in zip(_ordered, _ordered[1:])), (
+        f"the inset was drawn to show D_t falling with diameter at Q_REF, and it does not: "
+        f"{drawn_at_ref}")
+    assert all(i_y[0] < v < i_y[1] for v in drawn_at_ref.values()), "a curve leaves the inset at Q_REF"
 
-    # Centre panel (a)'s key under panel (a) and its colour bar. Anchored to the axes alone it
-    # would sit left of the block it describes.
-    fig.canvas.draw()
-    _r = fig.canvas.get_renderer()
-    _ab, _cb = axa.get_window_extent(_r), cax.get_window_extent(_r)
-    # Measure the panel without its key.
-    leg_a.set_visible(False)
-    _bottom = axa.get_tightbbox(_r).y0
-    leg_a.set_visible(True)
-    leg_a.set_bbox_to_anchor(((0.5 * (_ab.x0 + _cb.x1)) / fig.bbox.width,
-                              (_bottom - 0.018 * fig.bbox.height) / fig.bbox.height),
-                             transform=fig.transFigure)
+    # No tight_layout: it cannot see a colour bar placed as its own axes, or a key hung below a
+    # panel, as something needing room. The layout is computed from measured ink instead.
+    layout_column(fig, axa, cax, axb, leg_a, leg_b)
 
-    # Measured, not assumed.
     fig.canvas.draw()
     rend = fig.canvas.get_renderer()
     fig_bb = fig.bbox
 
-    # Clamp panel (b)'s key to the canvas, measured.
-    leg_b.set_visible(False)
-    _bottom_b = axb.get_tightbbox(rend).y0
-    leg_b.set_visible(True)
-    leg_b.set_bbox_to_anchor((0.5 * (axb.get_window_extent(rend).x0 + axb.get_window_extent(rend).x1)
-                              / fig.bbox.width,
-                              (_bottom_b - 0.018 * fig.bbox.height) / fig.bbox.height),
-                             transform=fig.transFigure)
-    fig.canvas.draw()
-    rend = fig.canvas.get_renderer()
-    # The clamp leaves 1.2 mm clear; it left 6 px (0.25 mm), inside save_figure's canvas guard.
-    _pad = 1.2 / 25.4 * fig.dpi
+    # The inset hides no data and no key.
+    _ib = axins.get_tightbbox(rend)
+    for line in axb.lines:
+        xy = axb.transData.transform(line.get_xydata())
+        xy = xy[np.isfinite(xy).all(axis=1)]
+        if line.get_label().startswith("Ø") and len(xy) > 1:
+            _d = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(xy, axis=0), axis=1))]
+            _t = np.linspace(0, _d[-1], 2000)
+            xy = np.column_stack([np.interp(_t, _d, xy[:, 0]), np.interp(_t, _d, xy[:, 1])])
+        elif not line.get_label().startswith("Ø"):
+            # Axhline / axvline: their x or y data are in axes fraction, so take the window extent
+            _lb = line.get_window_extent(rend)
+            xy = np.array([[_lb.x0, _lb.y0], [_lb.x1, _lb.y1],
+                           [0.5 * (_lb.x0 + _lb.x1), 0.5 * (_lb.y0 + _lb.y1)]])
+            if line.get_xdata()[0] == line.get_xdata()[-1]:          # vertical: test its x
+                assert not (_ib.x0 <= _lb.x0 <= _ib.x1), f"the inset covers {line.get_label()!r}"
+            else:                                                     # horizontal: test its y
+                assert not (_ib.y0 <= _lb.y0 <= _ib.y1), f"the inset covers {line.get_label()!r}"
+            continue
+        _n = int(((xy[:, 0] >= _ib.x0) & (xy[:, 0] <= _ib.x1)
+                  & (xy[:, 1] >= _ib.y0) & (xy[:, 1] <= _ib.y1)).sum())
+        assert _n == 0, f"the inset covers {_n} sampled points of {line.get_label()!r}"
     _lb = leg_b.get_window_extent(rend)
-    _over = max(0.0, _lb.x1 - (fig_bb.x1 - _pad)) - max(0.0, (fig_bb.x0 + _pad) - _lb.x0)
-    if _over:
-        _c = 0.5 * (_lb.x0 + _lb.x1) - _over
-        leg_b.set_bbox_to_anchor((_c / fig.bbox.width, _lb.y0 / fig.bbox.height),
-                                 transform=fig.transFigure)
-        leg_b.set_loc("lower center")
-        fig.canvas.draw()
-        print(f"  key (b) shifted {_over:.0f} px left to clear the canvas edge")
+    assert _lb.y1 < _ib.y0, "the inset overlaps the key of (b)"
+    _ab = axb.get_window_extent(rend)
+    assert _ab.x0 < _ib.x0 and _ib.x1 < _ab.x1 and _ab.y0 < _ib.y0 and _ib.y1 < _ab.y1, (
+        "the inset's ink leaves panel (b)")
+    # The two connector lines may cross a curve, but never a solved marker: every marker of (b)
+    # must stay at least its own radius plus 0.5 mm from both lines.
+    _px_mm = fig.dpi / 25.4
+    for _cp in zoom_links:
+        _a = axins.transAxes.transform(_cp.xy1)
+        _b = axb.transData.transform(_cp.xy2)
+        _seg = np.linspace(_a, _b, 400)
+        for line in axb.lines:
+            if not line.get_label().startswith("Ø"):
+                continue
+            _m = axb.transData.transform(line.get_xydata())
+            _dist = np.min(np.linalg.norm(_seg[:, None, :] - _m[None, :, :], axis=2))
+            _need = (0.5 * line.get_markersize() / 72 * 25.4 + 0.5) * _px_mm
+            assert _dist >= _need, (f"a connector passes {_dist / _px_mm:.2f} mm from a "
+                                    f"{line.get_label()} marker; need {_need / _px_mm:.2f} mm")
+    print("  inset: clear of every data curve, both reference lines and the key; "
+          "connectors clear of every marker")
+    S.assert_labels_clear(fig, [axa, axb, axins])
 
     for name, leg, ax in (("(a)", leg_a, axa), ("(b)", leg_b, axb)):
         lb = leg.get_window_extent(rend)

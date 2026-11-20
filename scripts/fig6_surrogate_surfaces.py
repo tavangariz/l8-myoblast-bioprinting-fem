@@ -31,7 +31,7 @@ Q_CONTOURS = (1.0, 10.0, 100.0)   # µL/s, the throughput lines the operating wi
 # Where each iso-throughput label sits, chosen rather than left to matplotlib.
 Q_LABEL_AT = ((161.8, 137.0), (253.8, 162.2), (298.6, 222.6))   # kPa, µm
 
-# One spelling of each axis, used once per row and once per column rather than once per panel.
+# One spelling of each axis, used on every panel.
 XLABEL = S.LBL["pressure"]
 # The layout is computed, not tuned.
 FIG_W_MM = 170.0
@@ -43,8 +43,8 @@ YLABEL = S.LBL["diameter"]
 
 
 def surface(ax, P, D, Z, cmap, letter, cbar_label, levels=24):
-    """Draw one field. Axis labels are NOT set here: all four panels share both axes, so the
-    labels are applied once per outer row and column by the loop in main()."""
+    """Draw one field. Axis labels are NOT set here: the loop in main() sets the same two on
+    every panel, after the shared-axis setup that would otherwise blank them."""
     m = ax.contourf(P, D, Z, levels=levels, cmap=cmap)
     S.panel_label(ax, letter)
     ax.grid(False)
@@ -130,7 +130,7 @@ def main():
 
     # PAPER, not SLIDE.
     with plt.rc_context(S.rc(S.PAPER)):
-        # Shared axes.
+        # Shared limits.
         fig, ax = plt.subplots(2, 2, figsize=(FIG_W_MM / 25.4, FIG_W_MM / 25.4), sharex=True, sharey=True)
         for _a in ax.flat:
             _a.set_box_aspect(1)
@@ -162,14 +162,11 @@ def main():
         mark_cases(ax[1, 1], rows)
 
         # The four SOLVED diameters as ticks.
-        for _r in range(2):
-            for _c in range(2):
-                _ax = ax[_r, _c]
-                _bottom, _left = _r == 1, _c == 0
-                _ax.set_yticks([100, 200, 250, 330])
-                _ax.set_xlabel(XLABEL if _bottom else "")
-                _ax.set_ylabel(YLABEL if _left else "")
-                _ax.tick_params(labelbottom=_bottom, labelleft=_left)
+        for _ax in ax.flat:
+            _ax.set_yticks([100, 200, 250, 330])
+            _ax.set_xlabel(XLABEL)
+            _ax.set_ylabel(YLABEL)
+            _ax.tick_params(labelbottom=True, labelleft=True)
 
         # Journal rule: figure titles and legends go in the main manuscript, never inside the
         # graphic file, so the facts the caption states are printed to stdout.
@@ -229,6 +226,32 @@ def main():
                 f"({'ink is cut off' if _mm < 0 else 'blank band'}); allowed 0 to {EMPTY_BAND_MM} mm")
         print("  four square panels; canvas margins " +
               ", ".join(f"{k} {v * 25.4:.1f} mm" for k, v in _bands.items()))
+        # Every panel has its own axes text, and none of it collides.
+        for _k, _a in enumerate(ax.flat):
+            for _w in ("x", "y"):
+                assert S._live_ticklabels(_a, _rend, _w), f"panel {'ABCD'[_k]}: no {_w} tick labels"
+            assert _a.get_xlabel() == XLABEL and _a.get_ylabel() == YLABEL, (
+                f"panel {'ABCD'[_k]} lacks an axis title")
+        S.assert_labels_clear(fig, ax)
+        _ink = []
+        for _k, _a in enumerate(ax.flat):
+            _txt = [_a.xaxis.label, _a.yaxis.label] + [t for t in _a.texts
+                                                         if t.get_gid() == "panel_label"]
+            _txt += [b for _w in ("x", "y") for _, b in S._live_ticklabels(_a, _rend, _w)]
+            _boxes = [t if not hasattr(t, "get_window_extent") else t.get_window_extent(_rend)
+                      for t in _txt]
+            _ink.append((_k, _boxes, _a.get_tightbbox(_rend)))
+        for _k, _boxes, _ in _ink:
+            for _j, _, _other in _ink:
+                if _j == _k:
+                    continue
+                for _b in _boxes:
+                    _dx = min(_b.x1, _other.x1) - max(_b.x0, _other.x0)
+                    _dy = min(_b.y1, _other.y1) - max(_b.y0, _other.y0)
+                    assert not (_dx > 0 and _dy > 0), (
+                        f"text of panel {'ABCD'[_k]} overlaps panel {'ABCD'[_j]} by "
+                        f"{_dx:.0f} x {_dy:.0f} px")
+        print("  every panel: x and y tick labels and titles, no text on a neighbouring panel")
 
         for w in save_figure(fig, FIGNAME, 600):   # 600 dpi: the PAPER profile carries a screen dpi, and 170 mm at 200 dpi is below the journal floor of 300
             print(f"  wrote {w}")

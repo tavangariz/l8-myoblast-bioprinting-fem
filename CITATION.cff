@@ -35,8 +35,8 @@ keywords:
   - cell damage
   - L8 myoblast
   - operating window
-version: "1.1.0"
-date-released: "2026-11-19"
+version: "1.1.1"
+date-released: "2026-11-20"
 preferred-citation:
   type: article
   title: "Computational screening of nozzle diameter and applied pressure for extrusion bioprinting of L8 skeletal myoblasts in alginate hydrogel"
