@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Additional file 2, Fig. S4: the apparent viscosity the simulations use, against shear rate.
+"""Additional file 1, Fig. S1: the apparent viscosity the simulations use, against shear rate.
 
 Power law eta = K gamma_dot^(n - 1) with K = 25.60 Pa s^n and n = 0.35 (Ning et al. 2018), bounded between
 0.003 and 500 Pa s as in the solver (Additional file 1, Eq. S7). The shaded band is the range of wall shear

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Table 1: wall shear stress and entrance pressure of the model against Ning et al. (2018), Table 2.
+"""Table 2: wall shear stress and entrance pressure of the model against Table 2 of Ning et al. (2018).
 
-Prints the nine columns of Table 1 from the grid and the agreement quoted in the text, the flow
+Prints the nine columns of Table 2 from the grid and the agreement quoted in the text, the flow
 rates that their wall shear stresses imply through Eq. 16, and the extensional damage that their
 extensional stresses give through Eq. 23.
 

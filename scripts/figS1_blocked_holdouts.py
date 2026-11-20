@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Additional file 1, Fig. S1: surrogate error with a whole nozzle diameter or applied pressure held out.
+"""Additional file 1, Fig. S2: surrogate error with a whole nozzle diameter or applied pressure held out.
 
 Reads results/surrogate/ (written by surrogate_validation.py) and fits nothing.
 

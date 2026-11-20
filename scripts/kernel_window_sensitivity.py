@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The full operating window under the six kernel and regularization settings of the surrogate (Additional file 2, Section S11).
+"""The full operating window under the six kernel and regularization settings of the surrogate (Additional file 1, Section S11).
 
 extra_numbers.py moves the Dt = 20 % boundary under these settings (Additional file 1, Table S4). This script adds
 the flow boundary (Q = 1 µL/s), the solved and unsolved diameters together (100, 150, 200, 250, 290, 330 µm),

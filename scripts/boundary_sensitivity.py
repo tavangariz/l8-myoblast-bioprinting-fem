@@ -5,7 +5,7 @@ d0_uncertainty_boundary.json
     D0 of calibration variant O (l8_calibration.py) moved by one standard error each way. The 20 % limit on the
     total damage becomes the limit Dn = (20 - 100 D0) / (1 - D0) on the surrogate, and the boundary at 200,
     250, 290 and 330 µm is the lowest pressure on a 0.1 kPa grid (25-400 kPa) where the surrogate reaches it.
-    The shifts are taken at the three solved diameters with a boundary inside the grid (Additional file 2,
+    The shifts are taken at the three solved diameters with a boundary inside the grid (Additional file 1,
     Table S10).
 
 measured_flow_operating_points.json

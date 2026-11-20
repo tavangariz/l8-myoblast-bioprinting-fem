@@ -11,7 +11,7 @@ is the same for every tracer.
 condition-dependent damage Dn. (C) Ds, on a logarithmic axis, against the radius in the nozzle.
 (D) Distribution of Dn over the tracers, with the entrance-associated damage common to every tracer
 dashed. How the tracer statistics depend on the tracer set is tracking_sensitivity.py (Additional
-file 2, Table S11).
+file 1, Table S11).
 
 Before drawing, the script checks that the damage law reproduces two values published by Ning et al.
 (2018), that the profile reproduces the Dn of the grid and that the tracks it draws reproduce the

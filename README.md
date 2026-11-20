@@ -57,14 +57,16 @@ element campaign (about 1.5 h per case), use the DOLFINx image: `docker compose 
 | Fig. 6 | `fig6_surrogate_surfaces.py` |
 | Fig. 7 | `fig7_operating_window.py` |
 | Fig. 8 | `fig8_contraction_flow.py` |
-| Additional file 1, Figs. S1–S3 | `figS1_blocked_holdouts.py`, `figS2_model_checks.py`, `figS3_interval_calibration.py` |
-| Additional file 2, Fig. S4 | `figS4_viscosity.py` |
+| Additional file 1, Fig. S1 | `figS4_viscosity.py` |
+| Additional file 1, Fig. S2 | `figS1_blocked_holdouts.py` |
+| Additional file 1, Fig. S3 | `figS2_model_checks.py` |
+| Additional file 1, Fig. S4 | `figS3_interval_calibration.py` |
 
-Table 1 and the numbers in the text come from `table1_comparison.py`, `matched_flow.py`, `inertia.py` and
+Table 2 and the numbers in the text come from `table1_comparison.py`, `matched_flow.py`, `inertia.py` and
 `reference_condition.py`; the supplementary tables from `build_supplementary_tables.py`,
 `surrogate_validation.py`, `evaluate_fem_checks.py` and `evaluate_boundary_checks.py`.
 
-## Analyses of Additional file 2
+## Analyses of Additional file 1
 
 | Section | Script | Output in `results/analyses/` |
 |---|---|---|
@@ -100,7 +102,7 @@ scripts/              solver, damage law, surrogate and one script per figure
 scripts/validation/   comparisons with published flow and damage data
 results/fem/          the 32 solved cases, per-case solver output, reference-condition field
 results/surrogate/    surrogate validation
-results/analyses/     analyses of Additional file 2, caption numbers of Fig. 5
+results/analyses/     analyses of Additional file 1, caption numbers of Fig. 5
 ```
 
 ## Citation

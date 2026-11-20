@@ -2,9 +2,9 @@
 """Fig. 3: predicted damage against nozzle diameter at 200 kPa.
 
 (A) Total damage and (B) the entrance and nozzle-shear terms of the condition-dependent damage Dn,
-read from the grid. (C) Shear rate at nozzle entry against entry radius for the 168 tracers at the
-reference condition (200 kPa, 200 µm), integrated through the solved field in
-results/fem/checkpoints/.
+read from the grid. (C) Shear rate against radius one nozzle diameter downstream of the nozzle
+inlet, for 440 tracers released 0.2 mm into the cartridge at the reference condition (200 kPa,
+200 µm) and integrated through the solved field in results/fem/checkpoints/.
 
     python scripts/fig3_damage_vs_diameter.py
 """

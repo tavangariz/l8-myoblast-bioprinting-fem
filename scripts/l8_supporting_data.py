@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Data readers for Fig. 3C and Additional file 1, Fig. S2.
+"""Data readers for Fig. 3C and Additional file 1, Fig. S3.
 
 tracer_entry()   shear rate and radius of each tracer at nozzle entry, from the solved field
 read_pairs()     the 32 cases on meshes M12 and M16, reduced through l8_damage.derive

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Additional file 1, Fig. S2: three checks on the model.
+"""Additional file 1, Fig. S3: three checks on the model.
 
 (A) Change in the condition-dependent damage Dn between meshes M12 and M16. (B) Entrance share of
 Dn against applied pressure. (C) Entrance pressure against a Bagley extrapolation to zero nozzle

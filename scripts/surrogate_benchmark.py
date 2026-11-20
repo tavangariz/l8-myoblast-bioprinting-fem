@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The Gaussian process against interpolants of the same 32 solved cases (Additional file 2, Section S11).
+"""The Gaussian process against interpolants of the same 32 solved cases (Additional file 1, Section S11).
 
 Every method sees the same training data and is scored on the same tests:
 

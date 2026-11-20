@@ -184,7 +184,7 @@ def panel_calibration(ax, y, pred, sd, dia, letter="D"):
     interval. This is the panel that decides whether the posterior standard deviation
     drawn on the response surface can be read as an error bar, and the answer here is
     that it cannot: 27 of 32 fall inside, and with 32 dependent predictions the size of the
-    undercoverage is itself uncertain. Drawn alone as Additional file 1, Fig. S3
+    undercoverage is itself uncertain. Drawn alone as Additional file 1, Fig. S4
     (figS3_interval_calibration.py), where `letter` is None.
     """
     half = 1.96 * sd

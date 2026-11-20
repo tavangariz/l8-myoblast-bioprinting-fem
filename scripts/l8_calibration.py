@@ -13,7 +13,7 @@ under-predicted by 2.1-6.6 percentage points. Three readings of that gap are com
 
 The damage Ning et al. measured through the 100, 250 and 330 µm nozzles at 200 kPa (their Fig. 7) enters no
 fit and is the out-of-sample test. The same chain serves the RSC96 Schwann-cell suspension, whose rheology and
-damage law they report alongside L8. Additional file 2, Section S8 and Table S6. Writes
+damage law they report alongside L8. Additional file 1, Section S8 and Table S6. Writes
 results/analyses/calibration_variants.json.
 
     python scripts/l8_calibration.py

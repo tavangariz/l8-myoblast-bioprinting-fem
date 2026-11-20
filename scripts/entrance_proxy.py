@@ -13,7 +13,7 @@ each field, along the axis through the cartridge-to-nozzle step:
   resolved axial stress         3 eta(sqrt(3) eps_dot) eps_dot at the peak, generalized-Newtonian,
                                 with the solver's bounded power-law viscosity
 
-and the ratio of each between the first two fields, next to the ratio of tau_e (Additional file 2, Section
+and the ratio of each between the first two fields, next to the ratio of tau_e (Additional file 1, Section
 S12, Table S15). The solved fields (.pkl, written by the solver with L8_VIZ_CKPT) are not distributed except
 the reference one; writes results/analyses/entrance_proxy.json.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Additional file 1, Fig. S3: leave-one-out error against the nominal 95 % interval of the surrogate.
+"""Additional file 1, Fig. S4: leave-one-out error against the nominal 95 % interval of the surrogate.
 
 Each of the 32 predictions of the condition-dependent damage Dn, the quantity the surrogate emulates,
 is plotted at its nominal 95 % half-width (1.96 posterior standard deviations) against its actual

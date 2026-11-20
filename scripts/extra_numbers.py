@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Numbers the article and Additional file 2 quote that no other script writes, each computed here.
+"""Numbers the article and Additional file 1 quote that no other script writes, each computed here.
 
 matched-flow stresses  tau_e at 1 and 17.94 µL/s for every nozzle (PCHIP in log10 Q), and the
                        monotone bound on the 330 µm point that lies below the 440 Pa floor;
@@ -8,7 +8,7 @@ surrogate settings     the Dt = 20 % boundary and window membership near it unde
                        regularization variants of Additional file 1, Table S4;
 measured-flow point    Dt at the pressure where the measured 200 µm flow reaches 1 µL/s;
 nozzle friction        the Dt = 20 % boundary with the developed nozzle friction scaled by 1 % each way
-                       (Additional file 2, Table S10).
+                       (Additional file 1, Table S10).
 
 Writes results/analyses/extra_numbers.json.
 

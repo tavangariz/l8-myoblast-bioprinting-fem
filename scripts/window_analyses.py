@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""What the operating window and the nozzle orderings depend on (Additional file 2, Section S9).
+"""What the operating window and the nozzle orderings depend on (Additional file 1, Section S9).
 
 Four analyses from the 32 solved cases and the surrogate, with no new flow solution:
 
