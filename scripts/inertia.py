@@ -3,7 +3,7 @@
 
 Both solutions are reduced through l8_damage.derive. For every case the script prints the inertial
 share of the entrance pressure, the fraction of p_en removed without the convective term
-(Additional file 1, Table S1), and inertia's share of the condition-dependent damage Dn. It then
+(Additional file 1, Table S13), and inertia's share of the condition-dependent damage Dn. It then
 prints the rise in Dn from the 200 to the 330 µm nozzle at 200 kPa with and without inertia, and
 compares the inertial part of p_en with the kinetic energy the jet carries out of the nozzle,
 alpha * rho * u_mean**2 / 2, with alpha = 3(3n+1)**2 / ((2n+1)(5n+3)) for developed power-law flow.

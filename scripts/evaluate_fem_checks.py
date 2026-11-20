@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare the surrogate with the eleven FEM checks of the operating window (Additional file 1, Table S5).
+"""Compare the surrogate with the eleven FEM checks of the operating window (Additional file 1, Table S12).
 
 The checks were fixed by prespecify_fem_checks.py from the surrogate's predictions before any of
 them was solved. Each solved check is reduced through l8_damage.derive, as a grid case, and

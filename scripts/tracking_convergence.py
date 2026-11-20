@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The tracer paths of Fig. 5 and Table S11 against the integration tolerances (Additional file 1, Section S10).
+"""The tracer paths of Fig. 5 and Table S2 against the integration tolerances (Additional file 1, Section S4).
 
 A tracer released near the cartridge wall passes within a few µm of the contraction corner, and its radius in the
 nozzle is the slowest quantity of the tracking to converge. For each of the four sets of tracking_sensitivity.py,

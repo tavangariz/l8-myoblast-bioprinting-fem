@@ -1,4 +1,4 @@
-"""Per FEM check, the margin to each limit and which method decides differently (Additional file 1, Section S11).
+"""Per FEM check, the margin to each limit and which method decides differently (Additional file 1, Section S6).
 
 Rebuilds the four emulators of surrogate_benchmark.py on the same 32 cases and, for each of the fifteen FEM
 checks, records the margin of the FEM solution to the damage limit (Dt = 20 %) and to the flow limit (1 µL/s),

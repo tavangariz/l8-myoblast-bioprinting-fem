@@ -6,7 +6,7 @@ d0_uncertainty_boundary.json
     total damage becomes the limit Dn = (20 - 100 D0) / (1 - D0) on the surrogate, and the boundary at 200,
     250, 290 and 330 µm is the lowest pressure on a 0.1 kPa grid (25-400 kPa) where the surrogate reaches it.
     The shifts are taken at the three solved diameters with a boundary inside the grid (Additional file 1,
-    Table S10).
+    Table S11).
 
 measured_flow_operating_points.json
     The predicted damage at each operating point (results/optimal_params/L8_operating_points.csv) and at the

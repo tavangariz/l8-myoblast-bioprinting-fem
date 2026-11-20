@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""How the tracer statistics of Fig. 5 depend on the tracer set (Additional file 1, Section S10, Table S11).
+"""How the tracer statistics of Fig. 5 depend on the tracer set (Additional file 1, Section S4, Table S2).
 
 Fig. 5 keeps the first 168 tracers, of a seeded pool, that reach the outlet inside the bore. A tracer is
 dropped if its path does not reach the outlet within the integration window or if it crosses the wall by more

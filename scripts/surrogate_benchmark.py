@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""The Gaussian process against interpolants of the same 32 solved cases (Additional file 1, Section S11).
+"""The Gaussian process against interpolants of the same 32 solved cases (Additional file 1, Section S6).
 
 Every method sees the same training data and is scored on the same tests:
 
   held-out splits   one case, one whole diameter, one whole pressure left out (the tests of
                     surrogate_validation.py); a tensor-product interpolant needs a complete grid, so single
                     cases are left out of a thin-plate radial basis function instead, the scattered-data
-                    counterpart (Tables S12 and S13);
+                    counterpart (Tables S5 and S6);
   FEM checks        the eleven conditions of prespecify_fem_checks.py and the four of
                     prespecify_boundary_checks.py, none used in any fit;
   decisions         the Dt = 20 % boundary and the operating point of every diameter, and the nozzle
-                    with the lowest damage at the operating points (Table S14);
+                    with the lowest damage at the operating points (Table S7);
   cost              time per query.
 
 Interpolants: tensor PCHIP in (diameter, log10 P), bicubic spline in (diameter, log10 P), thin-plate RBF in

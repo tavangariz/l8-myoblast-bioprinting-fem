@@ -77,7 +77,7 @@ Table 2 and the numbers in the text come from `table1_comparison.py`, `matched_f
 | S12 The entrance stress against the resolved flow | `entrance_proxy.py` | `entrance_proxy.json` |
 | S13 The same pipeline for RSC96 Schwann cells | `rsc96_transfer.py` | `rsc96_transfer.json` |
 
-The four FEM checks of the 20% limit on the total damage (Additional file 1, Table S5) were fixed by
+The four FEM checks of the 20% limit on the total damage (Additional file 1, Table S12) were fixed by
 `prespecify_boundary_checks.py` before any of them was solved. They are compared with the surrogate by
 `evaluate_boundary_checks.py`. The script `entrance_proxy.py` reads two solved fields that are not distributed
 for their size; its output is included. The values digitised from the figures of Ning *et al.* (2018) are in

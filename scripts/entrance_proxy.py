@@ -14,7 +14,7 @@ each field, along the axis through the cartridge-to-nozzle step:
                                 with the solver's bounded power-law viscosity
 
 and the ratio of each between the first two fields, next to the ratio of tau_e (Additional file 1, Section
-S12, Table S15). The solved fields (.pkl, written by the solver with L8_VIZ_CKPT) are not distributed except
+S13, Table S16). The solved fields (.pkl, written by the solver with L8_VIZ_CKPT) are not distributed except
 the reference one; writes results/analyses/entrance_proxy.json.
 
     python scripts/entrance_proxy.py REF_PKL HIGH_PKL [MORE_PKL ...]

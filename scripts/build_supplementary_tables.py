@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Per-case values for Additional file 1, Table S1.
+"""Per-case values for Additional file 1, Table S13.
 
 For each of the 32 cases: the shear damage averaged over the nozzle cross-section by area (Eq. 21)
 and by volumetric flux (Eq. S9), the flux-weighted fraction of the cross-section inside the

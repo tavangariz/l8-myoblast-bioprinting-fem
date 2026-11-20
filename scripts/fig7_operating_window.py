@@ -5,7 +5,7 @@
 Q = 1 µL/s, the 32 grid cases, the ranges of entrance stress (440-9251 Pa) and wall shear stress
 (100-1000 Pa) on which the two damage branches were calibrated, the eleven FEM checks of the
 published damage law and the four of the 20 % limit on the total damage (Additional file 1,
-Table S5). (B) Total damage against flow rate for each nozzle.
+Table S12). (B) Total damage against flow rate for each nozzle.
 
     python scripts/fig7_operating_window.py
 """

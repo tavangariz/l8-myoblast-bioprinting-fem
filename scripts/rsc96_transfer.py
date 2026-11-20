@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The same pipeline for a second cell line and bioink (Additional file 1, Section S13, Table S16).
+"""The same pipeline for a second cell line and bioink (Additional file 1, Section S12, Table S15).
 
 Ning et al. (2018) characterised two suspensions on the same cartridge and nozzles: L8 myoblasts and RSC96
 Schwann cells, each in 1.5 % alginate, with their own power-law rheology and damage law. The RSC96 suspension

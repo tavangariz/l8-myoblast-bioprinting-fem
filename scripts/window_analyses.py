@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""What the operating window and the nozzle orderings depend on (Additional file 1, Section S9).
+"""What the operating window and the nozzle orderings depend on (Additional file 1, Section S7).
 
 Four analyses from the 32 solved cases and the surrogate, with no new flow solution:
 
   calibration   the three readings of l8_calibration.py (P published, O published + D0, R refitted):
                 window membership, Dt = 20 % boundaries, operating points, both diameter orderings;
   thresholds    the window and the nozzle choice under damage limits of 10-25 % and flow limits of
-                0.1-10 µL/s (Table S7);
+                0.1-10 µL/s (Table S8);
   extrapolation for every solved case, whether its stresses and residence time lie inside the ranges
                 the two damage branches were fitted on, and by what factor the shear or the entrance
                 term would have to change to move the case across the 20 % limit; the same factors
-                for the matched-flow ordering (Table S8);
+                for the matched-flow ordering (Table S9);
   flow          the damage chain re-evaluated at the flow rates Ning et al. measured instead of the solved
                 ones (200 µm at 50-400 kPa, their Table 1; 250 and 330 µm at 200 kPa, their Fig. 4D), with
-                the calibration held fixed and refitted (Table S9).
+                the calibration held fixed and refitted (Table S10).
 
 Variant O is the calibration of the article. Writes results/analyses/window_analyses.json.
 

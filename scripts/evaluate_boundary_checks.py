@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare the surrogate with the four FEM checks of the 20 % limit on the total damage (Additional file 1, Table S5).
+"""Compare the surrogate with the four FEM checks of the 20 % limit on the total damage (Additional file 1, Table S12).
 
 The cases were fixed by prespecify_boundary_checks.py before any was solved. Errors are on Dn, the quantity
 the surrogate emulates; window membership is decided on the total Dt = D0 + (1 - D0) Dn. Writes

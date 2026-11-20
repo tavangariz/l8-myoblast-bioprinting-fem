@@ -5,10 +5,10 @@ matched-flow stresses  tau_e at 1 and 17.94 µL/s for every nozzle (PCHIP in log
                        monotone bound on the 330 µm point that lies below the 440 Pa floor;
 upper boundary         tau_e where Dt = 20 % is reached at 200, 250 and 330 µm;
 surrogate settings     the Dt = 20 % boundary and window membership near it under the kernel and
-                       regularization variants of Additional file 1, Table S4;
+                       regularization variants of Additional file 1, Table S14;
 measured-flow point    Dt at the pressure where the measured 200 µm flow reaches 1 µL/s;
 nozzle friction        the Dt = 20 % boundary with the developed nozzle friction scaled by 1 % each way
-                       (Additional file 1, Table S10).
+                       (Additional file 1, Table S11).
 
 Writes results/analyses/extra_numbers.json.
 

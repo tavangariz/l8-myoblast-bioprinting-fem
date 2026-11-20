@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The accuracy of the nozzle friction subtracted in Eq. 17, from the Bagley check (Additional file 1, Section S9).
+"""The accuracy of the nozzle friction subtracted in Eq. 17, from the Bagley check (Additional file 1, Section S7).
 
 The entrance pressure is the applied pressure minus the developed nozzle friction computed analytically from the
 solved flow (Eq. 17). The Bagley extrapolation on the same finite element model (Additional file 1, Fig. S3C;
